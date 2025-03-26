@@ -1,9 +1,20 @@
-import React from 'react';
+/* eslint-disable jsx-a11y/img-redundant-alt */
+/* eslint-disable jsx-a11y/alt-text */
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
 function Home() {
+  const [professeur, setProfesseur] = useState(null);
+
+  useEffect(() => {
+    fetch('http://localhost:5000/professeur-du-jour')
+      .then(response => response.json())
+      .then(data => setProfesseur(data))
+      .catch(error => console.error('Erreur:', error));
+  }, []);
+
   return (
     <div>
       <Header />
@@ -35,6 +46,21 @@ function Home() {
               </div>
             </Link>
           </div>
+        </div>
+
+        {/* Affichage du professeur du jour */}
+        <div className="prof-container">
+          <h2>Professeur du Jour</h2>
+          {professeur ? (
+            <div className="prof-card">
+              <h3>{professeur.prenom} {professeur.nom}</h3>
+              <p>Spécialité : {professeur.specialite}</p>
+              <p>Université : {professeur.univ_etudes}</p>
+              <img src={professeur.photo} alt="Photo du professeur" className="prof-img" />
+            </div>
+          ) : (
+            <p>Chargement...</p>
+          )}
         </div>
       </main>
       <Footer />

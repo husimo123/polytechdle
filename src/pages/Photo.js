@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/img-redundant-alt */
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
@@ -45,8 +46,8 @@ function Photo() {
         </div>
 
         {/* Jeu */}
-        <div className="game-container">
-          <div className="box">
+        <div className="box">
+          <div className="game-container">
             <h3>Quel professeur de Polytech figure sur la photo suivante ?</h3>
             <br />
             <img

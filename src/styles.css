@@ -372,7 +372,7 @@ input[type=text] {
 }
 
 
-input[type=submit] {
+input[type=submit], button  {
     width: 100px;
     height: 25px;
     margin-left: 25px;
@@ -381,19 +381,18 @@ input[type=submit] {
     cursor: pointer;
     border-radius: 20px;
     border: 1px solid #2d9fd9;
-
     box-sizing: border-box;
 }
 
 .PhD_Année {
     display: inline-block;  /* Ajuste la taille au contenu */
     padding: 10px 20px;     /* Ajoute un peu d'espace autour du texte */
-    border: 2px solid white; /* Bordure blanche */
+    border: 4px solid #0069B4; /* Bordure blanche */
     border-radius: 15px;    /* Coins arrondis */
     font-size: 1.5em;       /* Taille du texte */
     font-weight: bold;      /* Texte en gras */
     color: black;           /* Texte blanc */
-    background-color: transparent; /* Fond transparent */
+    background-color: white; /* Fond transparent */
     text-align: center;     /* Centre le texte */
     margin :10px;
 }
