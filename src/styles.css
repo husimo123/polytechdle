@@ -1,0 +1,472 @@
+/* Styles globaux */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Roboto', sans-serif;
+}
+
+/* Fond fixe */
+body {
+    font-family: 'Poppins', sans-serif;
+    background-image: url('img/background.png');
+    /* Image de fond */
+    background-position: center;
+    background-size: cover;
+    background-attachment: fixed;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    ;
+    align-items: center;
+    text-align: center;
+    color: #000;
+}
+
+/* En-tête */
+header {
+    width: 100%;
+    padding: 20px 0;
+    position: relative;
+    background-color: transparent;
+    /* Fond transparent pour l'en-tête */
+}
+
+/* Conteneur de l'en-tête */
+.header-content {
+    display: flex;
+    justify-content: center;
+    /* Centrer tous les éléments */
+    align-items: center;
+    width: 100%;
+    max-width: 1200px;
+    /* Limiter la largeur de l'en-tête */
+    margin: 0 auto;
+}
+ /* Pour la partie classic_page*/
+.header-classic {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.header-classic li {
+    margin: 0;
+}
+
+.header-classic a {
+    text-decoration: none;
+}
+
+.header-classic img {
+    width: 225px; /* Adjust size as needed */
+    height: 85px;
+    vertical-align: middle;
+    filter: grayscale(100%) opacity(0.6);
+    transition: filter 0.3s ease;
+}
+
+.header-classic a.selected img {
+    filter: none;
+    opacity: 1;
+}
+
+/* Logo Engrenage (à gauche) */
+.logo-container.left {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.logo-gear {
+    width: 50px;
+    /* Taille de l'engrenage */
+    height: auto;
+}
+
+/* Logo Polytech Angers (au centre) avec effet de survol */
+.logo-container.center {
+    flex: 2;
+    display: flex;
+    justify-content: center;
+    padding: 10px;
+}
+
+.logo-polytech {
+    max-width: 400px;
+    /* Taille du logo Polytech Angers */
+    height: auto;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    /* Transition pour l'animation */
+    border-radius: 10px;
+    /* Ajout de bords arrondis pour un effet plus doux */
+}
+
+.logo-polytech:hover {
+    transform: scale(1.05);
+    /* Agrandir légèrement l'image au survol */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    /* Ombrage au survol */
+}
+
+/* Drapeau (à droite) */
+.language-selector.right {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.flag {
+    width: 50px;
+    /* Taille du drapeau */
+    height: auto;
+}
+
+/* Contenu principal */
+.menu-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#subtitle {
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    font-weight: 1000;
+    color: #0a1417;
+    text-transform: uppercase;
+    font-style: normal
+}
+
+#subtitle span {
+    background: #1c9cd9;
+    padding: 5px 10px;
+    box-shadow: 0 4px 4px 0 rgba(0, 0, 0, .15);
+    border-style: solid;
+    border-color: #000000;
+    border-radius: 8px;
+    background-image: url('img/background_title.png');
+    background-size: 100% 100%;
+    font-size: 15px;
+}
+
+.buttons-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 20px;
+}
+
+.button-link {
+    text-decoration: none;
+    display: block;
+}
+
+.button-game {
+    position: relative;
+    background-color: rgba(0, 0, 0, 0.7);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.3s ease, background-color 0.3s;
+    max-width: 550px;
+}
+
+.button-game:hover {
+    transform: scale(1.05);
+    background-color: rgba(0, 0, 0, 0.9);
+}
+
+.button-img {
+    width: 100%;
+    height: auto;
+}
+
+.button-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 2rem;
+    font-weight: bold;
+    position: absolute;
+    left: 225px;
+    bottom: 75px;
+    color: #000;
+}
+
+.button-description {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.25rem;
+    position: absolute;
+    left: 225px;
+    bottom: 50px;
+    color: #000;
+}
+
+/* Animation d'apparition */
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fadeIn {
+    animation: fadeIn 1s ease-out;
+}
+
+.game-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+footer {
+    width: 100%;
+    text-align: center;
+    padding: 20px;
+    background-color: rgba(0, 0, 0, 0.6);
+    /* Fond sombre pour le footer */
+    position: relative;
+    color: #fff;
+}
+
+
+
+/* Box css */
+
+/* Conteneur principal du jeu */
+.game-container {
+    display: flex;
+    flex-direction: column; /* Empile les éléments verticalement */
+    align-items: center; /* Centre les éléments horizontalement */
+    justify-content: center; /* Centre les éléments verticalement */
+    text-align: center;
+    width: 100%; /* S'adapte à la largeur disponible */
+    max-width: 500px; /* Largeur maximale */
+}
+
+/* Boîtes de jeu */
+.box {
+    width: 440px; /* Largeur fixe */
+    min-height: 50px; /* Hauteur minimale pour éviter les boîtes trop petites */
+    background-color: #0BBBEF;
+    border: 4px solid #0069B4;
+    padding: 10px;
+    margin: 10px auto; /* Centrage automatique */
+    display: flex;
+    flex-direction: column; /* Alignement vertical du contenu */
+    align-items: center; /* Centre les éléments horizontalement */
+    text-align: center;
+    border-radius: 10px; /* Coins arrondis pour un design plus doux */
+}
+
+.button-choice,
+td {
+    margin-left: auto;
+    margin-right: auto;
+    padding: 10px;
+    margin: 10px;
+    padding-left: 10px;
+
+}
+
+#button-choice {
+    padding: 10px;
+    margin: 10px;
+    padding-left: 10px;
+}
+
+.button-text {
+    font-size: 15px;
+    padding-bottom: 4px;
+    font-family: "Montserrat";
+}
+
+label{
+    
+    margin-top: 20px;
+}
+
+/* switch button code from https://www.w3schools.com/howto/howto_css_switch.asp */
+/* The switch - the box around the slider */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* The slider */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+input:checked+.slider {
+    background-color: #2196F3;
+}
+
+input:focus+.slider {
+    box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked+.slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+.text-input {
+
+    padding-left: 25px;
+}
+
+input[type=text] {
+    border-radius: 20px;
+    border: 1px solid #2d9fd9;
+    width: 175px;
+    height: 25px;
+    padding-left: 7px;
+}
+
+
+input[type=submit] {
+    width: 100px;
+    height: 25px;
+    margin-left: 25px;
+    background-color: #2196F3;
+    border-color: #2196F3;
+    cursor: pointer;
+    border-radius: 20px;
+    border: 1px solid #2d9fd9;
+
+    box-sizing: border-box;
+}
+
+.PhD_Année {
+    display: inline-block;  /* Ajuste la taille au contenu */
+    padding: 10px 20px;     /* Ajoute un peu d'espace autour du texte */
+    border: 2px solid white; /* Bordure blanche */
+    border-radius: 15px;    /* Coins arrondis */
+    font-size: 1.5em;       /* Taille du texte */
+    font-weight: bold;      /* Texte en gras */
+    color: black;           /* Texte blanc */
+    background-color: transparent; /* Fond transparent */
+    text-align: center;     /* Centre le texte */
+    margin :10px;
+}
+
+.PhD_Indices {
+    display: flex;
+    justify-content: space-around; /* Espacement équilibré */
+    margin-top: 10px; /* Petit espace sous PhD_Année */
+    gap: 30px; /* Espacement entre les deux box */
+}
+
+.PhD_Box {
+    width: 120px; /* Largeur des petites box */
+    height: 120px; /* Hauteur fixe */
+    background-color: #0BBBEF; /* Fond bleu */
+    border: 2px solid white; /* Bordure blanche */
+    border-radius: 15px; /* Coins arrondis */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centre l'icône et le texte */
+    justify-content: center;
+    padding: 10px;
+    text-align: center;
+    color: black; /* Couleur du texte */
+    position: relative; /* Nécessaire pour la bulle */
+    cursor: pointer; /* Indique qu'on peut interagir */
+    transition: background-color 0.3s ease-in-out;
+}
+
+.PhD_Box:hover {
+    background-color: white; /* Légèrement plus foncé au survol */
+}
+
+
+.PhD_Box img {
+    width: 50px; /* Taille de l'icône */
+    height: 50px;
+    margin-bottom: 5px; /* Espacement entre l'icône et le texte */
+}
+
+.tooltip {
+    position: absolute;
+    top: 105%; /* Met la bulle bien en dessous */
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.85);
+    color: white;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-size: 14px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+    z-index: 10;
+}
+
+/* Triangle sous la bulle */
+.tooltip::after {
+    content: "";
+    position: absolute;
+    top: -16px; /* Positionne le triangle au-dessus de la bulle */
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 8px;
+    border-style: solid;
+    border-color: transparent transparent rgba(0, 0, 0, 0.85) transparent;
+}
+
+/* Affichage fluide au survol */
+.PhD_Box:hover .tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(5px);
+}
