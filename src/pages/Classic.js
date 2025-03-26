@@ -46,14 +46,13 @@ function Classic() {
         <div className="box">
           <div className="game-container">
             <h3>Quel professeur sera celui d'aujourd'hui ?</h3>
-            <div className="PhD_Année">2022</div>
-            <div className="PhD_Indices">
-              <div className="PhD_Box">
+            <div className="Classic_Indices">
+              <div className="Classic_Box">
                 <img src="/img/icon-age.png" alt="Icône 1" />
                 <p>Indice Âge</p>
                 <div className="tooltip">Âge du Professeur</div>
               </div>
-              <div className="PhD_Box">
+              <div className="Classic_Box">
                 <img src="/img/icon-specialite.png" alt="Icône 2" />
                 <p>Indice Spécialité</p>
                 <div className="tooltip">
@@ -61,8 +60,43 @@ function Classic() {
                 </div>
               </div>
             </div>
+            
           </div>
         </div>
+
+        {/* Tableau avec les informations supplémentaires */}
+        <div className="classic-prof-info">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Genre</th>
+                    <th>Laris</th>
+                    <th>Âge</th>
+                    <th>Spécialité</th>
+                    <th>Université d'études</th>
+                    <th>Année PhD</th>
+                    <th>Statut</th>
+                    <th>Sujet Thèse</th>
+                    <th>Photo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Genre Value</td>
+                    <td>Laris Value</td>
+                    <td>Age Value</td>
+                    <td>Speciality Value</td>
+                    <td>University Value</td>
+                    <td>PhD Year Value</td>
+                    <td>Status Value</td>
+                    <td>Thesis Subject Value</td>
+                    <td>
+                      <img src="/img/professor-photo.jpg" alt="Professor" width="100" />
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+          </div>
 
         {/* Saisie du nom du professeur */}
         <div className="box">
@@ -92,20 +126,7 @@ function Classic() {
         <div>
           <h3>Le professeur d'hier était : {lastProfessor}</h3>
         </div>
-
-        {/* Section promotionnelle */}
-        <div className="box">
-          <h1>Vous en voulez plus ?</h1>
-          <h2>Jouez à nos autres jeux !</h2>
-          <br />
-          <div>
-            <Link to="/etudiantdle" className="button-link">
-              <div className="button-game">
-                <img src="/img/etudiantdle.png" className="button-img" alt="Etudiantdle" />
-              </div>
-            </Link>
-          </div>
-        </div>
+        
       </main>
 
       <Footer />

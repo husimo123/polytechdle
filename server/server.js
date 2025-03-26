@@ -10,7 +10,7 @@ const db = mysql.createConnection({
     host: 'localhost',
     user: 'root', // Change si nécessaire
     password: '', // Mettre ton mot de passe si tu en as un
-    database: 'db_test'
+    database: 'polytechdle'
 });
 
 db.connect(err => {
