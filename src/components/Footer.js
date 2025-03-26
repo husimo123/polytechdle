@@ -3,7 +3,7 @@ import React from 'react';
 function Footer() {
   return (
     <footer>
-      <p>&copy; 2023 SIMON Hugo & NAVET Titouan & HODE Dorian. Tous droits réservés.</p>
+      <p>&copy; 2025 SIMON Hugo & NAVET Titouan & HODE Dorian. Tous droits réservés.</p>
     </footer>
   );
 }
