@@ -30,6 +30,22 @@ app.get('/professeur-du-jour', (req, res) => {
     });
 });
 
+// Route pour la recherche
+app.get('/search', (req, res) => {
+    const query = req.query.q;
+    const sql = `
+      SELECT * FROM professeurs
+      WHERE prenom LIKE ? OR nom LIKE ?
+    `;
+    db.query(sql, [`${query}%`, `${query}%`], (err, results) => {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+      res.json(results);
+    });
+});
+
+
 app.listen(5000, () => {
     console.log('Serveur démarré sur le port 5000');
 });
