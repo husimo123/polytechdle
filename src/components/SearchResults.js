@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-export default function SearchResults({ query }) {
+export default function SearchResults({ query, onSelect }) {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -38,7 +38,12 @@ export default function SearchResults({ query }) {
   return (
     <ul className="search-results">
       {results.map((prof, index) => (
-        <li key={index} className="search-item">
+        <li
+          key={index}
+          className="search-item"
+          onClick={() => onSelect(prof)}
+          style={{ cursor: 'pointer' }}
+        >
           <img
             src={prof.photo}
             alt={`${prof.prenom} ${prof.nom}`}

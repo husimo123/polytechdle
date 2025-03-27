@@ -1,5 +1,4 @@
-/* eslint-disable jsx-a11y/img-redundant-alt */
-import React, { useState, Suspense, useDeferredValue } from "react";
+import React, { useState, useEffect, Suspense, useDeferredValue } from "react";
 import { Link } from "react-router-dom";
 import SearchResults from "../components/SearchResults.js";
 import Header from "../components/Header";
@@ -7,10 +6,23 @@ import Footer from "../components/Footer";
 
 function Classic() {
   const [query, setQuery] = useState("");
+  const [selectedProfessors, setSelectedProfessors] = useState([]);
+  const [isCorrect, setIsCorrect] = useState(null);
   const deferredQuery = useDeferredValue(query);
   const isStale = query !== deferredQuery;
-  
-  const lastProfessor = "Nom du Professeur"; // Remplace par une variable dynamique si nécessaire
+
+  const correctProfessor = "Nom du Professeur Correct"; // Replace with the actual correct professor's name or ID
+  const lastProfessor = "Nom du Professeur"; // Replace with dynamic variable if needed
+
+  const handleProfessorSelect = (professor) => {
+    setSelectedProfessors((prevSelected) => [...prevSelected, professor]);
+    setIsCorrect(professor.nom === correctProfessor); // Adjust the comparison as needed
+  };
+
+  const getExcludedProfessorsQuery = () => {
+    const excludedIds = selectedProfessors.map(prof => prof.id).join(',');
+    return excludedIds ? `&exclude=${excludedIds}` : '';
+  };
 
   return (
     <div>
@@ -40,7 +52,7 @@ function Classic() {
           <span>Devine le Professeur de Polytech Angers</span>
         </div>
 
-        {/* Boîte contenant le jeu */}
+        {/* Game box */}
         <div className="box">
           <div className="game-container">
             <h3>Quel professeur sera celui d'aujourd'hui ?</h3>
@@ -61,39 +73,41 @@ function Classic() {
           </div>
         </div>
 
-        {/* Tableau avec les informations supplémentaires */}
+        {/* Table with additional information */}
         <div className="classic-prof-info">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Photo</th>
-                    <th>Genre</th>
-                    <th>Laris</th>
-                    <th>Âge</th>
-                    <th>Spécialité</th>
-                    <th>Université d'études</th>
-                    <th>Année PhD</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>
-                      <img src="/img/professor-photo.jpg" alt="Professor" width="100" />
-                    </td>
-                    <td>Genre Value</td>
-                    <td>Laris Value</td>
-                    <td>Age Value</td>
-                    <td>Speciality Value</td>
-                    <td>University Value</td>
-                    <td>PhD Year Value</td>
-                  </tr>
-                </tbody>
-              </table>
-          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Photo</th>
+                <th>Genre</th>
+                <th>Laris</th>
+                <th>Âge</th>
+                <th>Spécialité</th>
+                <th>Université d'études</th>
+                <th>Année PhD</th>
+              </tr>
+            </thead>
+            <tbody>
+              {selectedProfessors.map((professor, index) => (
+                <tr key={index}>
+                  <td>
+                    <img src={professor.photo} alt="Professor" width="100" />
+                  </td>
+                  <td>{professor.genre}</td>
+                  <td>{professor.laris}</td>
+                  <td>{professor.age}</td>
+                  <td>{professor.specialite}</td>
+                  <td>{professor.universite}</td>
+                  <td>{professor.anneePhd}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
-        {/* Saisie du nom du professeur avec autocomplétion */}
+        {/* Professor name input with autocomplete */}
         <div className="box">
-          <form>
+          <form onSubmit={(e) => e.preventDefault()}>
             <table>
               <tbody>
                 <tr>
@@ -114,20 +128,42 @@ function Classic() {
             </table>
           </form>
 
-          {/* Affichage des résultats de la recherche */}
+          {/* Display search results */}
           <Suspense fallback={<h2>Chargement...</h2>}>
             <div style={{ opacity: isStale ? 0.5 : 1 }}>
-              <SearchResults query={deferredQuery} />
+              <SearchResults
+                query={`${deferredQuery}${getExcludedProfessorsQuery()}`}
+                onSelect={handleProfessorSelect}
+              />
             </div>
           </Suspense>
+
+          {/* Display correctness indicator */}
+          {isCorrect !== null && (
+            <div style={{ color: isCorrect ? 'green' : 'red' }}>
+              {isCorrect ? 'Correct !' : 'Faux, essayez encore !'}
+            </div>
+          )}
         </div>
 
-        {/* Affichage du dernier professeur à deviner */}
+        {/* Display the last professor to guess */}
         <div>
           <h3>Le professeur d'hier était : {lastProfessor}</h3>
         </div>
 
-        {/* Section promotionnelle */}
+        {/* Display previously selected professors */}
+        <div>
+          <h3>Professeurs déjà essayés :</h3>
+          <ul>
+            {selectedProfessors.map((professor, index) => (
+              <li key={index}>
+                {professor.prenom} {professor.nom}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Promotional section */}
         <div className="box">
           <h1>Vous en voulez plus ?</h1>
           <h2>Jouez à nos autres jeux !</h2>
@@ -140,7 +176,6 @@ function Classic() {
             </Link>
           </div>
         </div>
-        
       </main>
 
       <Footer />
