@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useLanguage } from '../LanguageContext';
 
 function Header() {
   const [isModalOpen, setIsModalOpen] = useState(false); // État pour la popup
   const [timeRemaining, setTimeRemaining] = useState(''); // État pour le temps restant de la journée
+  const { language, toggleLanguage } = useLanguage(); // Utilisation du contexte de la langue
 
   // Fonction pour ouvrir la popup
   const openModal = () => {
@@ -39,6 +41,15 @@ function Header() {
     return () => clearInterval(interval); // Nettoyage du setInterval lorsqu'on quitte la page
   }, []); // Le tableau vide [] garantit que le setInterval n'est appelé qu'une seule fois au démarrage
 
+  // Texte de la popup en fonction de la langue
+  const modalText = language === 'fr' ?
+    `Dans ce jeu, tu as trois modes : Classic, PhD et Photo.
+     Dans chacun d'eux, tu devras deviner un professeur de polytech.
+     .\nTemps restant aujourd'hui : \n${timeRemaining}` :
+    `In this game, you have three modes: Classic, PhD, and Photo.
+     In each of them, you will have to guess a professor from polytech.
+     .\nTime remaining today: \n${timeRemaining}`;
+
   return (
     <header>
       <div className="header-content">
@@ -56,7 +67,12 @@ function Header() {
           </Link>
         </div>
         <div className="language-selector right">
-          <img src="/img/france.png" alt="Drapeau France" className="flag" />
+          <img
+            src={language === 'fr' ? "/img/france.png" : "/img/royaume-uni.png"}
+            alt={language === 'fr' ? "Drapeau France" : "Drapeau UK"}
+            className="flag"
+            onClick={toggleLanguage} // Change la langue quand on clique
+          />
         </div>
       </div>
 
@@ -65,12 +81,10 @@ function Header() {
         <div className="modal-overlay">
           <div className="modal-content">
             <button className="close-btn" onClick={closeModal}>X</button>
-            <h2>Bienvenue dans polytechdle !</h2>
+            <h2>{language === 'fr' ? 'Bienvenue dans polytechdle !' : 'Welcome to polytechdle!'}</h2>
             <textarea
               className="text-box"
-              value={` Dans ce jeu, tu as trois modes : Classic, PhD et Photo.
-                Dans chacun d'eux, tu devras deviner un professeur de polytech.
-                .\nTemps restant aujourd'hui : \n${timeRemaining}`}
+              value={modalText}
             />
           </div>
         </div>
