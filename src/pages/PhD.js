@@ -23,13 +23,13 @@ function PhD() {
             </Link>
           </li>
           <li>
-            <Link to="/photo">
-              <img src="/img/photo-button.png" alt="Photo" />
+            <Link to="/phd" className="selected">
+              <img src="/img/phd-button.png" alt="PhD" />
             </Link>
           </li>
           <li>
-            <Link to="/phd" className="selected">
-              <img src="/img/phd-button.png" alt="PhD" />
+            <Link to="/photo">
+              <img src="/img/photo-button.png" alt="Photo" />
             </Link>
           </li>
         </ul>
@@ -45,13 +45,13 @@ function PhD() {
           <div className="game-container">
             <h3>Quel professeur a obtenu son diplôme PhD cette année ?</h3>
             <div className="PhD_Année">2022</div>
-            <div className="PhD_Indices">
-              <div className="PhD_Box">
+            <div className="Indices">
+              <div className="Box_Indice">
                 <img src="/img/icon-age.png" alt="Icône 1" />
                 <p>Indice Âge</p>
                 <div className="tooltip">Âge du Professeur</div>
               </div>
-              <div className="PhD_Box">
+              <div className="Box_Indice">
                 <img src="/img/icon-specialite.png" alt="Icône 2" />
                 <p>Indice Spécialité</p>
                 <div className="tooltip">

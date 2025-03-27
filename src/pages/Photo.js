@@ -1,20 +1,18 @@
 /* eslint-disable jsx-a11y/img-redundant-alt */
-import React, { useState } from "react";
+import React, { useState, Suspense, useDeferredValue  } from "react";
 import { Link } from "react-router-dom";
+import SearchResults from "../components/SearchResults.js";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
 function Photo() {
-  const [guess, setGuess] = useState("");
+  const [query, setQuery] = useState("");
+    const deferredQuery = useDeferredValue(query);
+    const isStale = query !== deferredQuery;
+
   const [blurMode, setBlurMode] = useState(false);
   const [colorMode, setColorMode] = useState(false);
   const lastProfessor = "Nom du Professeur"; // À remplacer dynamiquement
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Deviner :", guess);
-    // Ajoute ici la logique de vérification
-  };
 
   return (
     <div>
@@ -28,13 +26,13 @@ function Photo() {
             </Link>
           </li>
           <li>
-            <Link to="/photo" className="selected">
-              <img src="/img/photo-button.png" alt="Photo" />
+            <Link to="/phd">
+              <img src="/img/phd-button.png" alt="PhD" />
             </Link>
           </li>
           <li>
-            <Link to="/phd">
-              <img src="/img/phd-button.png" alt="PhD" />
+            <Link to="/photo" className="selected">
+              <img src="/img/photo-button.png" alt="Photo" />
             </Link>
           </li>
         </ul>
@@ -96,9 +94,9 @@ function Photo() {
           </div>
         </div>
 
-        {/* Saisie du nom du professeur */}
+        {/* Saisie du nom du professeur avec autocomplétion */}
         <div className="box">
-          <form onSubmit={handleSubmit}>
+          <form>
             <table>
               <tbody>
                 <tr>
@@ -107,8 +105,8 @@ function Photo() {
                       id="input"
                       type="text"
                       placeholder="Nom du professeur"
-                      value={guess}
-                      onChange={(e) => setGuess(e.target.value)}
+                      value={query}
+                      onChange={(e) => setQuery(e.target.value)}
                     />
                   </td>
                   <td className="text-input">
@@ -118,6 +116,13 @@ function Photo() {
               </tbody>
             </table>
           </form>
+
+          {/* Affichage des résultats de la recherche */}
+          <Suspense fallback={<h2>Chargement...</h2>}>
+            <div style={{ opacity: isStale ? 0.5 : 1 }}>
+              <SearchResults query={deferredQuery} />
+            </div>
+          </Suspense>
         </div>
 
         {/* Affichage du dernier professeur à deviner */}
