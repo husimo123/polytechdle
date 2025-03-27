@@ -1,20 +1,39 @@
 /* eslint-disable jsx-a11y/img-redundant-alt */
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
+
 function Photo() {
-  const [guess, setGuess] = useState("");
-  const [blurMode, setBlurMode] = useState(false);
-  const [colorMode, setColorMode] = useState(false);
+  const [guess, setGuess] = useState(""); // Guess de l'utilisateur
+  const [blurMode, setBlurMode] = useState(false); // Blur image avec chaque guess
+  const [blur, setBlurimg] = useState(true); // Blur image
+  const [nb_tries, setnbTries] =  useState(0); // Nombre d'essais
+  const [colorMode, setColorMode] = useState(false); // colorimétrie de l'image
   const lastProfessor = "Nom du Professeur"; // À remplacer dynamiquement
+  const [professeur, setProfesseur] = useState(null);
+  
+  useEffect(() => {
+    fetch('http://localhost:5000/professeur-du-jour')
+       .then(response => response.json())
+       .then(data => setProfesseur(data))
+       .catch(error => console.error('Erreur:', error));
+  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Deviner :", guess);
+    if(guess === "hugo"){
+      setBlurimg(false);
+    }
+    
+    setnbTries(nb_tries + 1);
+    
+    console.log("Nb tries : ", nb_tries);
     // Ajoute ici la logique de vérification
   };
+  
 
   return (
     <div>
@@ -50,16 +69,28 @@ function Photo() {
           <div className="game-container">
             <h3>Quel professeur de Polytech figure sur la photo suivante ?</h3>
             <br />
+            {/* Verification que l'objet professeur n'est pas vide pour eviter le crash de la page. */}
+            {professeur ? (
             <img
-              src="https://perso-laris.univ-angers.fr/~lhommeau/photo2.jpg"
+              src={professeur.photo}
               alt="Photo prof"
               width="200"
               height="200"
-              style={{
-                filter: blurMode ? "blur(10px)" : "none",
-                WebkitFilter: blurMode ? "blur(10px)" : "none",
-              }}
+              style={
+                // Blur the image considering the choice of the user. 
+                // Known bug : if the nb of tries is above 15 you cannot unblur the image.
+                blurMode ? {
+                  filter: `blur(${15 - nb_tries}px)`,
+                  WebkitFilter: `blur(${15 - nb_tries}px)`,
+                } : {
+                  filter: `blur(${15}px)`,
+                  WebkitFilter: `blur(${15}px)`,
+                }}
             />
+          ) : (
+              <p>Chargement...</p>
+            )}
+            <p>{nb_tries}</p>
             {/* Options de jeu */}
             <div>
               <table id="button-choice">
@@ -108,11 +139,16 @@ function Photo() {
                       type="text"
                       placeholder="Nom du professeur"
                       value={guess}
-                      onChange={(e) => setGuess(e.target.value)}
+                      // if 
+                      onChange={(e) => {
+                        
+                          setGuess(e.target.value);
+                        
+                      }}
                     />
                   </td>
                   <td className="text-input">
-                    <button type="submit">Deviner</button>
+                    <button type="submit" >Deviner</button>
                   </td>
                 </tr>
               </tbody>
