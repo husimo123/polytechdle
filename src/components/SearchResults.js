@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 export default function SearchResults({ query, onSelect }) {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [selectedProfs, setSelectedProfs] = useState(new Set());
 
   useEffect(() => {
     if (query.trim() === "") {
@@ -13,7 +14,6 @@ export default function SearchResults({ query, onSelect }) {
     const fetchResults = async () => {
       setLoading(true);
       try {
-        // Modifiez ici pour utiliser l'URL complète de l'API
         const response = await fetch(`http://localhost:5000/search?q=${query}`);
         const data = await response.json();
         setResults(data);
@@ -25,7 +25,20 @@ export default function SearchResults({ query, onSelect }) {
     };
 
     fetchResults();
-  }, [query]); // Déclenche uniquement quand `query` change
+  }, [query]);
+
+  const toggleSelect = (prof) => {
+    setSelectedProfs((prevSelected) => {
+      const newSelected = new Set(prevSelected);
+      if (newSelected.has(prof.id)) {
+        newSelected.delete(prof.id);
+      } else {
+        newSelected.add(prof.id);
+      }
+      return newSelected;
+    });
+    onSelect(prof);
+  };
 
   if (loading) {
     return <p>Chargement...</p>;
@@ -40,8 +53,8 @@ export default function SearchResults({ query, onSelect }) {
       {results.map((prof, index) => (
         <li
           key={index}
-          className="search-item"
-          onClick={() => onSelect(prof)}
+          className={`search-item ${selectedProfs.has(prof.id) ? 'selected' : ''}`}
+          onClick={() => toggleSelect(prof)}
           style={{ cursor: 'pointer' }}
         >
           <img
