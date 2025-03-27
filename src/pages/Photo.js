@@ -1,5 +1,4 @@
 /* eslint-disable jsx-a11y/img-redundant-alt */
-
 import React, {  useEffect, useState, Suspense, useDeferredValue  } from "react";
 import { Link } from "react-router-dom";
 import SearchResults from "../components/SearchResults.js";
@@ -8,19 +7,21 @@ import Footer from "../components/Footer";
 
 
 function Photo() {
-
+  // Appel a la base
   const [query, setQuery] = useState("");
   const deferredQuery = useDeferredValue(query);
   const isStale = query !== deferredQuery;
-
-  const [guess, setGuess] = useState(""); // Guess de l'utilisateur
-  const [blurMode, setBlurMode] = useState(false); // Blur image avec chaque guess
-  const [blur, setBlurimg] = useState(true); // Blur image
-  const [nb_tries, setnbTries] =  useState(0); // Nombre d'essais
-  const [colorMode, setColorMode] = useState(false); // colorimétrie de l'image
   const lastProfessor = "Nom du Professeur"; // À remplacer dynamiquement
   const [professeur, setProfesseur] = useState(null);
+
+  // Gestion des données de la page
+  const [guess, setGuess] = useState(""); // Guess de l'utilisateur
+  const [blurMode, setBlurMode] = useState(true); // Blur image avec chaque guess
+  const [blur, setBlurimg] = useState(true); // Blur image
+  const [nb_tries, setnbTries] =  useState(0); // Nombre d'essais
+  const [colorMode, setColorMode] = useState(true); // colorimétrie de l'image
   
+  // Get data from the database
   useEffect(() => {
     fetch('http://localhost:5000/professeur-du-jour')
        .then(response => response.json())
@@ -28,7 +29,7 @@ function Photo() {
        .catch(error => console.error('Erreur:', error));
   }, []);
 
-
+  // Gestiond du bouton deviner
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Deviner :", guess);
@@ -85,20 +86,35 @@ function Photo() {
               width="200"
               height="200"
               style={
-                // Blur the image considering the choice of the user. 
-                // Known bug : if the nb of tries is above 15 you cannot unblur the image.
-                blurMode ? {
-                  filter: `blur(${15 - nb_tries}px)`,
-                  WebkitFilter: `blur(${15 - nb_tries}px)`,
-                } : {
+               // Blur the image and color considering the choice of the user.
+               // Adaptive blur and grey 
+                blurMode && colorMode ? {
+                  filter: `grayscale(100%) blur(${Math.max(0, 15 - nb_tries)}px)`, // progressively reduce the blur on the image
+                  WebkitFilter: `grayscale(100%) blur(${Math.max(15 - nb_tries)}px)`, 
+                } :
+                //Full blur and grey
+                !blurMode && colorMode ? {
+                  filter: `grayscale(100%) blur(${15}px)`,
+                  WebkitFilter: `grayscale(100%) blur(${15}px)`,
+                }:
+                // Adaptive blur and colors
+                  blurMode && !colorMode ?
+                {
+                  filter: `blur(${Math.max(0, 15 - nb_tries)}px)`, // progressively reduce the blur on the image
+                  WebkitFilter: `blur(${Math.max(15 - nb_tries)}px)`, 
+                }:
+                // Full blur and color
+                {
                   filter: `blur(${15}px)`,
                   WebkitFilter: `blur(${15}px)`,
-                }}
+                }
+              }
             />
-          ) : (
-              <p>Chargement...</p>
+          ) : ( // si l'objet est vide on affiche :
+              <p>Erreur de chargement...</p>
             )}
-            <p>{nb_tries}</p>
+            <br></br>
+            <p>Nombre d'essais :{nb_tries}</p>
             {/* Options de jeu */}
             <div>
               <table id="button-choice">
@@ -137,7 +153,7 @@ function Photo() {
 
         {/* Saisie du nom du professeur avec autocomplétion */}
         <div className="box">
-          <form>
+          <form onSubmit={(handleSubmit)}>
             <table>
               <tbody>
                 <tr>
@@ -156,7 +172,7 @@ function Photo() {
                     <button type="submit" >Deviner</button>
                   </td>
                 </tr>
-              </tbody>
+                </tbody>
             </table>
           </form>
 
