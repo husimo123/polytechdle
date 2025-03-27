@@ -1,18 +1,16 @@
 /* eslint-disable jsx-a11y/img-redundant-alt */
-import React, { useState } from "react";
+import React, { useState, Suspense, useDeferredValue } from "react";
 import { Link } from "react-router-dom";
+import SearchResults from "../components/SearchResults.js";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
 function Classic() {
-  const [guess, setGuess] = useState("");
+  const [query, setQuery] = useState("");
+  const deferredQuery = useDeferredValue(query);
+  const isStale = query !== deferredQuery;
+  
   const lastProfessor = "Nom du Professeur"; // Remplace par une variable dynamique si nécessaire
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Deviner :", guess);
-    // Ajoute ici la logique pour vérifier la réponse
-  };
 
   return (
     <div>
@@ -25,13 +23,13 @@ function Classic() {
             </Link>
           </li>
           <li>
-            <Link to="/photo">
-              <img src="/img/photo-button.png" alt="Photo" />
+            <Link to="/phd">
+              <img src="/img/phd-button.png" alt="PhD" />
             </Link>
           </li>
           <li>
-            <Link to="/phd">
-              <img src="/img/phd-button.png" alt="PhD" />
+            <Link to="/photo">
+              <img src="/img/photo-button.png" alt="Photo" />
             </Link>
           </li>
         </ul>
@@ -46,21 +44,20 @@ function Classic() {
         <div className="box">
           <div className="game-container">
             <h3>Quel professeur sera celui d'aujourd'hui ?</h3>
-            <div className="Classic_Indices">
-              <div className="Classic_Box">
-                <img src="/img/icon-age.png" alt="Icône 1" />
-                <p>Indice Âge</p>
-                <div className="tooltip">Âge du Professeur</div>
+            <div className="Indices">
+              <div className="Box_Indice">
+                <img src="/img/icon-statut.png" alt="Icône 1" />
+                <p>Indice du Statut</p>
+                <div className="tooltip">Statut professionel du Professeur</div>
               </div>
-              <div className="Classic_Box">
-                <img src="/img/icon-specialite.png" alt="Icône 2" />
-                <p>Indice Spécialité</p>
+              <div className="Box_Indice">
+                <img src="/img/icon-these.png" alt="Icône 2" />
+                <p>Indice du Sujet de Thèse</p>
                 <div className="tooltip">
-                  Spécialité à laquelle le professeur est affilié
+                  Nom du sujet de Thèse du Professeur
                 </div>
               </div>
             </div>
-            
           </div>
         </div>
 
@@ -69,38 +66,34 @@ function Classic() {
               <table>
                 <thead>
                   <tr>
+                    <th>Photo</th>
                     <th>Genre</th>
                     <th>Laris</th>
                     <th>Âge</th>
                     <th>Spécialité</th>
                     <th>Université d'études</th>
                     <th>Année PhD</th>
-                    <th>Statut</th>
-                    <th>Sujet Thèse</th>
-                    <th>Photo</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
+                    <td>
+                      <img src="/img/professor-photo.jpg" alt="Professor" width="100" />
+                    </td>
                     <td>Genre Value</td>
                     <td>Laris Value</td>
                     <td>Age Value</td>
                     <td>Speciality Value</td>
                     <td>University Value</td>
                     <td>PhD Year Value</td>
-                    <td>Status Value</td>
-                    <td>Thesis Subject Value</td>
-                    <td>
-                      <img src="/img/professor-photo.jpg" alt="Professor" width="100" />
-                    </td>
                   </tr>
                 </tbody>
               </table>
           </div>
 
-        {/* Saisie du nom du professeur */}
+        {/* Saisie du nom du professeur avec autocomplétion */}
         <div className="box">
-          <form onSubmit={handleSubmit}>
+          <form>
             <table>
               <tbody>
                 <tr>
@@ -109,8 +102,8 @@ function Classic() {
                       id="input"
                       type="text"
                       placeholder="Nom du professeur"
-                      value={guess}
-                      onChange={(e) => setGuess(e.target.value)}
+                      value={query}
+                      onChange={(e) => setQuery(e.target.value)}
                     />
                   </td>
                   <td className="text-input">
@@ -120,11 +113,32 @@ function Classic() {
               </tbody>
             </table>
           </form>
+
+          {/* Affichage des résultats de la recherche */}
+          <Suspense fallback={<h2>Chargement...</h2>}>
+            <div style={{ opacity: isStale ? 0.5 : 1 }}>
+              <SearchResults query={deferredQuery} />
+            </div>
+          </Suspense>
         </div>
 
         {/* Affichage du dernier professeur à deviner */}
         <div>
           <h3>Le professeur d'hier était : {lastProfessor}</h3>
+        </div>
+
+        {/* Section promotionnelle */}
+        <div className="box">
+          <h1>Vous en voulez plus ?</h1>
+          <h2>Jouez à nos autres jeux !</h2>
+          <br />
+          <div>
+            <Link to="/etudiantdle" className="button-link">
+              <div className="button-game">
+                <img src="/img/etudiantdle.png" className="button-img" alt="Etudiantdle" />
+              </div>
+            </Link>
+          </div>
         </div>
         
       </main>
