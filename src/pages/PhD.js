@@ -1,18 +1,16 @@
 /* eslint-disable jsx-a11y/img-redundant-alt */
-import React, { useState } from "react";
+import React, { useState, Suspense, useDeferredValue } from "react";
 import { Link } from "react-router-dom";
+import SearchResults from "../components/SearchResults.js";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
 function PhD() {
-  const [guess, setGuess] = useState("");
-  const lastProfessor = "Nom du Professeur"; // Remplace par une variable dynamique si nécessaire
+  const [query, setQuery] = useState("");
+  const deferredQuery = useDeferredValue(query);
+  const isStale = query !== deferredQuery;
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Deviner :", guess);
-    // Ajoute ici la logique pour vérifier la réponse
-  };
+  const lastProfessor = "Nom du Professeur"; // Remplace par une variable dynamique si nécessaire
 
   return (
     <div>
@@ -25,13 +23,13 @@ function PhD() {
             </Link>
           </li>
           <li>
-            <Link to="/photo">
-              <img src="/img/photo-button.png" alt="Photo" />
+            <Link to="/phd" className="selected">
+              <img src="/img/phd-button.png" alt="PhD" />
             </Link>
           </li>
           <li>
-            <Link to="/phd" className="selected">
-              <img src="/img/phd-button.png" alt="PhD" />
+            <Link to="/photo">
+              <img src="/img/photo-button.png" alt="Photo" />
             </Link>
           </li>
         </ul>
@@ -47,13 +45,13 @@ function PhD() {
           <div className="game-container">
             <h3>Quel professeur a obtenu son diplôme PhD cette année ?</h3>
             <div className="PhD_Année">2022</div>
-            <div className="PhD_Indices">
-              <div className="PhD_Box">
+            <div className="Indices">
+              <div className="Box_Indice">
                 <img src="/img/icon-age.png" alt="Icône 1" />
                 <p>Indice Âge</p>
                 <div className="tooltip">Âge du Professeur</div>
               </div>
-              <div className="PhD_Box">
+              <div className="Box_Indice">
                 <img src="/img/icon-specialite.png" alt="Icône 2" />
                 <p>Indice Spécialité</p>
                 <div className="tooltip">
@@ -64,9 +62,9 @@ function PhD() {
           </div>
         </div>
 
-        {/* Saisie du nom du professeur */}
+        {/* Saisie du nom du professeur avec autocomplétion */}
         <div className="box">
-          <form onSubmit={handleSubmit}>
+          <form>
             <table>
               <tbody>
                 <tr>
@@ -75,8 +73,8 @@ function PhD() {
                       id="input"
                       type="text"
                       placeholder="Nom du professeur"
-                      value={guess}
-                      onChange={(e) => setGuess(e.target.value)}
+                      value={query}
+                      onChange={(e) => setQuery(e.target.value)}
                     />
                   </td>
                   <td className="text-input">
@@ -86,6 +84,13 @@ function PhD() {
               </tbody>
             </table>
           </form>
+
+          {/* Affichage des résultats de la recherche */}
+          <Suspense fallback={<h2>Chargement...</h2>}>
+            <div style={{ opacity: isStale ? 0.5 : 1 }}>
+              <SearchResults query={deferredQuery} />
+            </div>
+          </Suspense>
         </div>
 
         {/* Affichage du dernier professeur à deviner */}

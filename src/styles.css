@@ -197,7 +197,7 @@ header {
 }
 
 #subtitle {
-    margin-bottom: 1rem;
+    margin: 1rem;
     font-size: 1.1rem;
     font-weight: 1000;
     color: #0a1417;
@@ -492,21 +492,14 @@ input[type=submit], button  {
     margin :10px;
 }
 
-.PhD_Indices {
+.Indices {
     display: flex;
     justify-content: space-around; /* Espacement équilibré */
     margin-top: 10px; /* Petit espace sous PhD_Année */
     gap: 30px; /* Espacement entre les deux box */
 }
 
-.Classic_Indices {
-    display: flex;
-    justify-content: space-around; /* Espacement équilibré */
-    margin-top: 10px; /* Petit espace sous PhD_Année */
-    gap: 30px; /* Espacement entre les deux box */
-}
-
-.PhD_Box {
+.Box_Indice {
     width: 120px; /* Largeur des petites box */
     height: 120px; /* Hauteur fixe */
     background-color: #0BBBEF; /* Fond bleu */
@@ -524,30 +517,13 @@ input[type=submit], button  {
     transition: background-color 0.3s ease-in-out;
 }
 
-.Classic_Box {
-    width: 120px; /* Largeur des petites box */
-    height: 120px; /* Hauteur fixe */
-    background-color: #0BBBEF; /* Fond bleu */
-    border: 2px solid white; /* Bordure blanche */
-    border-radius: 15px; /* Coins arrondis */
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* Centre l'icône et le texte */
-    justify-content: center;
-    padding: 10px;
-    text-align: center;
-    color: black; /* Couleur du texte */
-    position: relative; /* Nécessaire pour la bulle */
-    cursor: pointer; /* Indique qu'on peut interagir */
-    transition: background-color 0.3s ease-in-out;
-}
 
-.PhD_Box:hover {
+.Box_Indice:hover {
     background-color: white; /* Légèrement plus foncé au survol */
 }
 
 
-.PhD_Box img {
+.Box_Indice img {
     width: 50px; /* Taille de l'icône */
     height: 50px;
     margin-bottom: 5px; /* Espacement entre l'icône et le texte */
@@ -584,8 +560,38 @@ input[type=submit], button  {
 }
 
 /* Affichage fluide au survol */
-.PhD_Box:hover .tooltip {
+.Box_Indice:hover .tooltip {
     opacity: 1;
     visibility: visible;
     transform: translateX(-50%) translateY(5px);
 }
+
+.search-results {
+    list-style: none;
+    padding: 0;
+    margin: 10px auto;
+    max-width: 300px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background: white;
+  }
+  
+  .search-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+  }
+  
+  .search-item:hover {
+    background: #f1f1f1;
+  }
+  
+  .prof-photo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+  }
+  
