@@ -568,18 +568,19 @@ input[type=submit], button  {
 
 .search-results {
     list-style: none;
-    padding: 0;
+    padding: 1;
     margin: 10px auto;
+    width: 300px;
     max-width: 300px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    background: white;
   }
   
   .search-item {
     display: flex;
     align-items: center;
     padding: 10px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
     border-bottom: 1px solid #eee;
     cursor: pointer;
   }
@@ -595,3 +596,11 @@ input[type=submit], button  {
     margin-right: 10px;
   }
   
+.separator {
+    margin: 1rem auto;
+    width: 350px;
+    height: 3px;
+    display: block;    
+    background: white;
+    border-radius: 8px;
+}

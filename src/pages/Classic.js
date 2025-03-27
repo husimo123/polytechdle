@@ -1,4 +1,5 @@
-import React, { useState, useEffect, Suspense, useDeferredValue } from "react";
+/* eslint-disable jsx-a11y/img-redundant-alt */
+import React, { useState, Suspense, useDeferredValue } from "react";
 import { Link } from "react-router-dom";
 import SearchResults from "../components/SearchResults.js";
 import Header from "../components/Header";

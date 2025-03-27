@@ -5,12 +5,38 @@ import SearchResults from "../components/SearchResults.js";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
+class Professeur {
+  constructor(prenom, nom, photo, isCorrect = false) {
+    this.prenom = prenom;
+    this.nom = nom;
+    this.photo = photo;
+    this.isCorrect = isCorrect;
+  }
+}
+
 function PhD() {
   const [query, setQuery] = useState("");
+  const [attempts, setAttempts] = useState([]);
   const deferredQuery = useDeferredValue(query);
   const isStale = query !== deferredQuery;
+  const ProfesseurADeviner = "Lhommeau";
+  const lastProfessor = "Nom du Professeur";
+  const [gameOver, setGameOver] = useState(false);
 
-  const lastProfessor = "Nom du Professeur"; // Remplace par une variable dynamique si nécessaire
+  const handleSelect = (prof) => {
+    if (gameOver || attempts.some((attempt) => attempt.nom === prof.nom)) return;
+    
+    const isCorrect = prof.nom.toLowerCase() === ProfesseurADeviner.toLowerCase();
+    const newAttempt = new Professeur(prof.prenom, prof.nom, prof.photo, isCorrect);
+    
+    setAttempts((prevAttempts) => [newAttempt, ...prevAttempts]);
+    if (isCorrect) setGameOver(true);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!query.trim() || gameOver) return;
+  };
 
   return (
     <div>
@@ -40,11 +66,10 @@ function PhD() {
           <span>Devine le Professeur de Polytech Angers</span>
         </div>
 
-        {/* Boîte contenant le jeu */}
         <div className="box">
           <div className="game-container">
             <h3>Quel professeur a obtenu son diplôme PhD cette année ?</h3>
-            <div className="PhD_Année">2022</div>
+            <div className="PhD_Année">2003</div>
             <div className="Indices">
               <div className="Box_Indice">
                 <img src="/img/icon-age.png" alt="Icône 1" />
@@ -54,17 +79,14 @@ function PhD() {
               <div className="Box_Indice">
                 <img src="/img/icon-specialite.png" alt="Icône 2" />
                 <p>Indice Spécialité</p>
-                <div className="tooltip">
-                  Spécialité à laquelle le professeur est affilié
-                </div>
+                <div className="tooltip">Spécialité à laquelle le professeur est affilié</div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Saisie du nom du professeur avec autocomplétion */}
         <div className="box">
-          <form>
+          <form onSubmit={handleSubmit}>
             <table>
               <tbody>
                 <tr>
@@ -75,30 +97,45 @@ function PhD() {
                       placeholder="Nom du professeur"
                       value={query}
                       onChange={(e) => setQuery(e.target.value)}
+                      disabled={gameOver}
                     />
                   </td>
                   <td className="text-input">
-                    <button type="submit">Deviner</button>
+                    <button type="submit" disabled={gameOver}>Deviner</button>
                   </td>
                 </tr>
               </tbody>
             </table>
           </form>
-
-          {/* Affichage des résultats de la recherche */}
           <Suspense fallback={<h2>Chargement...</h2>}>
             <div style={{ opacity: isStale ? 0.5 : 1 }}>
-              <SearchResults query={deferredQuery} />
+              {!gameOver && <SearchResults query={deferredQuery} onSelect={handleSelect} exclude={attempts.map(a => a.nom)} />}
             </div>
           </Suspense>
         </div>
 
-        {/* Affichage du dernier professeur à deviner */}
+        <div className="attempt-container">
+          <ul className="search-results">
+            {attempts.map((attempt, index) => (
+              <li
+                key={index}
+                className="search-item"
+                style={{ backgroundColor: attempt.isCorrect ? "green" : "red" }}
+              >
+                <img src={attempt.photo} alt={`${attempt.prenom} ${attempt.nom}`} className="prof-photo" />
+                <span>{attempt.prenom} {attempt.nom}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {gameOver && <h3>Bravo ! Vous avez trouvé le professeur du jour : {ProfesseurADeviner} 🎉</h3>}
+
         <div>
+          <hr className="separator" />
           <h3>Le professeur d'hier était : {lastProfessor}</h3>
         </div>
 
-        {/* Section promotionnelle */}
         <div className="box">
           <h1>Vous en voulez plus ?</h1>
           <h2>Jouez à nos autres jeux !</h2>

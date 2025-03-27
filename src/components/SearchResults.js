@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
-export default function SearchResults({ query, onSelect }) {
+export default function SearchResults({ query, onSelect, exclude = [] }) {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -13,10 +13,12 @@ export default function SearchResults({ query, onSelect }) {
     const fetchResults = async () => {
       setLoading(true);
       try {
-        // Modifiez ici pour utiliser l'URL complète de l'API
         const response = await fetch(`http://localhost:5000/search?q=${query}`);
         const data = await response.json();
-        setResults(data);
+        
+        // Exclure les professeurs déjà tentés
+        const filteredResults = data.filter(prof => !exclude.includes(prof.nom));
+        setResults(filteredResults);
       } catch (error) {
         console.error("Erreur lors de la récupération des résultats :", error);
       } finally {
@@ -25,7 +27,7 @@ export default function SearchResults({ query, onSelect }) {
     };
 
     fetchResults();
-  }, [query]); // Déclenche uniquement quand `query` change
+  }, [query, exclude]); // Ajout de `exclude` dans les dépendances
 
   if (loading) {
     return <p>Chargement...</p>;
@@ -42,13 +44,9 @@ export default function SearchResults({ query, onSelect }) {
           key={index}
           className="search-item"
           onClick={() => onSelect(prof)}
-          style={{ cursor: 'pointer' }}
+          style={{ cursor: "pointer" }}
         >
-          <img
-            src={prof.photo}
-            alt={`${prof.prenom} ${prof.nom}`}
-            className="prof-photo"
-          />
+          <img src={prof.photo} alt={`${prof.prenom} ${prof.nom}`} className="prof-photo" />
           <span>{prof.prenom} {prof.nom}</span>
         </li>
       ))}
