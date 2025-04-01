@@ -1,38 +1,41 @@
 /* eslint-disable jsx-a11y/img-redundant-alt */
-import React, { useState, Suspense, useDeferredValue } from "react";
+import React, { useEffect, useState, Suspense, useDeferredValue } from "react";
 import { Link } from "react-router-dom";
 import SearchResults from "../components/SearchResults.js";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-
-class Professeur {
-  constructor(prenom, nom, photo, isCorrect = false) {
-    this.prenom = prenom;
-    this.nom = nom;
-    this.photo = photo;
-    this.isCorrect = isCorrect;
-  }
-}
+import Professeur from "../components/Professeur.js";
 
 function PhD() {
   const [query, setQuery] = useState("");
   const [attempts, setAttempts] = useState([]);
   const deferredQuery = useDeferredValue(query);
   const isStale = query !== deferredQuery;
-  const ProfesseurADeviner = "Lhommeau";
+  const [professeur, setProfesseur] = useState(null);
   const lastProfessor = "Nom du Professeur";
   const [gameOver, setGameOver] = useState(false);
 
+  // Get data from the database
+  useEffect(() => {
+    fetch('http://localhost:5000/professeur-du-jour')
+        .then(response => response.json())
+        .then(data => setProfesseur(data))
+        .catch(error => console.error('Erreur:', error));
+  }, []);
+  
   const handleSelect = (prof) => {
     if (gameOver || attempts.some((attempt) => attempt.nom === prof.nom)) return;
     
-    const isCorrect = prof.nom.toLowerCase() === ProfesseurADeviner.toLowerCase();
-    const newAttempt = new Professeur(prof.prenom, prof.nom, prof.photo, isCorrect);
+    const isCorrect = prof.nom.toLowerCase() === professeur.nom.toLowerCase();
+    const newAttempt = new Professeur(
+      prof.nom, prof.prenom, prof.genre, prof.laris, prof.age, prof.specialite, 
+      prof.univ_etudes, prof.annee_phd, prof.statut, prof.sujet_these, prof.photo, isCorrect
+    );
     
     setAttempts((prevAttempts) => [newAttempt, ...prevAttempts]);
     if (isCorrect) setGameOver(true);
   };
-
+  
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!query.trim() || gameOver) return;
@@ -71,15 +74,17 @@ function PhD() {
             <h3>Quel professeur a obtenu son diplôme PhD cette année ?</h3>
             <div className="PhD_Année">2003</div>
             <div className="Indices">
-              <div className="Box_Indice">
+              <div className={`Box_Indice ${attempts.length < 3 ? "disabled" : ""}`}>
                 <img src="/img/icon-age.png" alt="Icône 1" />
                 <p>Indice Âge</p>
-                <div className="tooltip">Âge du Professeur</div>
+                {attempts.length < 3 && <p><span className="small-italic">Dans {3 - attempts.length} Essais</span></p>}
+                {attempts.length >= 3 && <div className="tooltip">Âge du Professeur : {professeur.age}</div>}
               </div>
-              <div className="Box_Indice">
+              <div className={`Box_Indice ${attempts.length < 6 ? "disabled" : ""}`}>
                 <img src="/img/icon-specialite.png" alt="Icône 2" />
                 <p>Indice Spécialité</p>
-                <div className="tooltip">Spécialité à laquelle le professeur est affilié</div>
+                {attempts.length < 6 && <p><span className="small-italic">Dans  {6 - attempts.length} Essais</span></p>}
+                {attempts.length >= 6 && <div className="tooltip">Spécialité : {professeur.specialite}</div>}
               </div>
             </div>
           </div>
@@ -129,7 +134,7 @@ function PhD() {
           </ul>
         </div>
 
-        {gameOver && <h3>Bravo ! Vous avez trouvé le professeur du jour : {ProfesseurADeviner} 🎉</h3>}
+        {gameOver && <h3>Bravo ! Vous avez trouvé le professeur du jour : {professeur.prenom} {professeur.nom} 🎉</h3>}
 
         <div>
           <hr className="separator" />

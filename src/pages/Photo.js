@@ -4,21 +4,21 @@ import { Link } from "react-router-dom";
 import SearchResults from "../components/SearchResults.js";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import Professeur from "../components/Professeur.js";
 
 
 function Photo() {
   // Appel a la base
   const [query, setQuery] = useState("");
+  const [attempts, setAttempts] = useState([]);
   const deferredQuery = useDeferredValue(query);
   const isStale = query !== deferredQuery;
   const lastProfessor = "Nom du Professeur"; // À remplacer dynamiquement
   const [professeur, setProfesseur] = useState(null);
-
+  const [gameOver, setGameOver] = useState(false);
+  
   // Gestion des données de la page
-  const [guess, setGuess] = useState(""); // Guess de l'utilisateur
   const [blurMode, setBlurMode] = useState(true); // Blur image avec chaque guess
-  const [blur, setBlurimg] = useState(true); // Blur image
-  const [nb_tries, setnbTries] =  useState(0); // Nombre d'essais
   const [colorMode, setColorMode] = useState(true); // colorimétrie de l'image
   
   // Get data from the database
@@ -30,24 +30,34 @@ function Photo() {
   }, []);
 
   // Gestiond du bouton deviner
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Deviner :", guess);
-    if(guess === "hugo"){
-      setBlurimg(false);
+  const handleSelect = (prof) => {
+    if (gameOver || attempts.some((attempt) => attempt.nom === prof.nom)) return;
+    
+    const isCorrect = prof.nom.toLowerCase() === professeur.nom.toLowerCase();
+    const newAttempt = new Professeur(
+      prof.nom, prof.prenom, prof.genre, prof.laris, prof.age, prof.specialite, 
+      prof.univ_etudes, prof.annee_phd, prof.statut, prof.sujet_these, prof.photo, isCorrect
+    );
+    
+    setAttempts((prevAttempts) => [newAttempt, ...prevAttempts]);
+    if (isCorrect) {
+      setGameOver(true);
+      ///////////////////////////////////////////////////////
+      setBlurMode(15); 
+      // Il faut trouver autre chose ici pour montrer l'image en claire quand on a trouvé le bon prof
+      ///////////////////////////////////////////////////////
     }
-    
-    setnbTries(nb_tries + 1);
-    
-    console.log("Nb tries : ", nb_tries);
-    // Ajoute ici la logique de vérification
   };
   
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!query.trim() || gameOver) return;
+    console.log(attempts.length);
+  };  
 
   return (
     <div>
       <Header />
-
       <nav>
         <ul className="header-classic">
           <li>
@@ -89,8 +99,8 @@ function Photo() {
                // Blur the image and color considering the choice of the user.
                // Adaptive blur and grey 
                 blurMode && colorMode ? {
-                  filter: `grayscale(100%) blur(${Math.max(0, 15 - nb_tries)}px)`, // progressively reduce the blur on the image
-                  WebkitFilter: `grayscale(100%) blur(${Math.max(15 - nb_tries)}px)`, 
+                  filter: `grayscale(100%) blur(${Math.max(0, 15 - attempts.length)}px)`, // progressively reduce the blur on the image
+                  WebkitFilter: `grayscale(100%) blur(${Math.max(15 - attempts.length)}px)`, 
                 } :
                 //Full blur and grey
                 !blurMode && colorMode ? {
@@ -100,8 +110,8 @@ function Photo() {
                 // Adaptive blur and colors
                   blurMode && !colorMode ?
                 {
-                  filter: `blur(${Math.max(0, 15 - nb_tries)}px)`, // progressively reduce the blur on the image
-                  WebkitFilter: `blur(${Math.max(15 - nb_tries)}px)`, 
+                  filter: `blur(${Math.max(0, 15 - attempts.length)}px)`, // progressively reduce the blur on the image
+                  WebkitFilter: `blur(${Math.max(15 - attempts.length)}px)`, 
                 }:
                 // Full blur and color
                 {
@@ -114,7 +124,7 @@ function Photo() {
               <p>Erreur de chargement...</p>
             )}
             <br></br>
-            <p>Nombre d'essais :{nb_tries}</p>
+            <p>Nombre d'essais :{attempts.length}</p>
             {/* Options de jeu */}
             <div>
               <table id="button-choice">
@@ -153,7 +163,7 @@ function Photo() {
 
         {/* Saisie du nom du professeur avec autocomplétion */}
         <div className="box">
-          <form onSubmit={(handleSubmit)}>
+          <form onSubmit={handleSubmit}>
             <table>
               <tbody>
                 <tr>
@@ -162,30 +172,44 @@ function Photo() {
                       id="input"
                       type="text"
                       placeholder="Nom du professeur"
-
                       value={query}
                       onChange={(e) => setQuery(e.target.value)}
-
+                      disabled={gameOver}
                     />
                   </td>
                   <td className="text-input">
-                    <button type="submit" >Deviner</button>
+                    <button type="submit" disabled={gameOver}>Deviner</button>
                   </td>
                 </tr>
-                </tbody>
+              </tbody>
             </table>
           </form>
-
-          {/* Affichage des résultats de la recherche */}
           <Suspense fallback={<h2>Chargement...</h2>}>
             <div style={{ opacity: isStale ? 0.5 : 1 }}>
-              <SearchResults query={deferredQuery} />
+              {!gameOver && <SearchResults query={deferredQuery} onSelect={handleSelect} exclude={attempts.map(a => a.nom)} />}
             </div>
           </Suspense>
         </div>
 
-        {/* Affichage du dernier professeur à deviner */}
+        <div className="attempt-container">
+          <ul className="search-results">
+            {attempts.map((attempt, index) => (
+              <li
+                key={index}
+                className="search-item"
+                style={{ backgroundColor: attempt.isCorrect ? "green" : "red" }}
+              >
+                <img src={attempt.photo} alt={`${attempt.prenom} ${attempt.nom}`} className="prof-photo" />
+                <span>{attempt.prenom} {attempt.nom}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {gameOver && <h3>Bravo ! Vous avez trouvé le professeur du jour : {professeur.prenom} {professeur.nom} 🎉</h3>}
+
         <div>
+          <hr className="separator" />
           <h3>Le professeur d'hier était : {lastProfessor}</h3>
         </div>
 

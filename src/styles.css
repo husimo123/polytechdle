@@ -515,6 +515,7 @@ input[type=submit], button  {
     position: relative; /* Nécessaire pour la bulle */
     cursor: pointer; /* Indique qu'on peut interagir */
     transition: background-color 0.3s ease-in-out;
+    font-size: 0.9em; 
 }
 
 
@@ -527,6 +528,16 @@ input[type=submit], button  {
     width: 50px; /* Taille de l'icône */
     height: 50px;
     margin-bottom: 5px; /* Espacement entre l'icône et le texte */
+}
+
+.Box_Indice.disabled {
+    background-color: #b0b0b0; /* Gris pour montrer que c'est désactivé */
+    cursor: not-allowed; /* Change le curseur pour montrer que ce n'est pas cliquable */
+    opacity: 0.5; /* Rend la box plus transparente */
+}
+
+.Box_Indice.disabled .tooltip {
+    display: none; /* Cache la bulle d’info tant que l'indice est désactivé */
 }
 
 .tooltip {
@@ -564,6 +575,12 @@ input[type=submit], button  {
     opacity: 1;
     visibility: visible;
     transform: translateX(-50%) translateY(5px);
+}
+
+.small-italic {
+    font-size: 0.8em; /* Plus petit */
+    font-style: italic; /* Italique */
+    opacity: 0.8; /* Légèrement atténué */
 }
 
 .search-results {
