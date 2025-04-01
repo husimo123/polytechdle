@@ -1,6 +1,7 @@
 /* eslint-disable jsx-a11y/img-redundant-alt */
 import React, { useState, Suspense, useDeferredValue } from "react";
 import { Link } from "react-router-dom";
+import { useLanguage } from "../LanguageContext";
 import SearchResults from "../components/SearchResults.js";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -10,20 +11,102 @@ function Classic() {
   const [selectedProfessors, setSelectedProfessors] = useState([]);
   const [isCorrect, setIsCorrect] = useState(null);
   const deferredQuery = useDeferredValue(query);
-  const isStale = query !== deferredQuery;
+  const [loading, setLoading] = useState(false);
+  const { language } = useLanguage();
 
-  const correctProfessor = "Nom du Professeur Correct"; // Replace with the actual correct professor's name or ID
-  const lastProfessor = "Nom du Professeur"; // Replace with dynamic variable if needed
+  const texts = {
+    fr: {
+      guessTitle: "Quel professeur sera celui d'aujourd'hui ?",
+      statusHint: "Indice du Statut",
+      statusTooltip: "Statut: Professeur",
+      thesisHint: "Indice du Sujet de Thèse",
+      thesisTooltip: "Sujet de thèse: Etude de systèmes à événements discrets",
+      correct: "Correct !",
+      wrong: "Faux, essayez encore !",
+      lastProfessor: "Le professeur d'hier était :",
+      placeholder: "Nom du professeur",
+      submit: "Deviner",
+    },
+    en: {
+      guessTitle: "Which professor is today’s?",
+      statusHint: "Status Hint",
+      statusTooltip: "Status: Professor",
+      thesisHint: "Thesis Topic Hint",
+      thesisTooltip: "Thesis Topic: Study of discrete event systems",
+      correct: "Correct!",
+      wrong: "Wrong, try again!",
+      lastProfessor: "Yesterday’s professor was:",
+      placeholder: "Professor's name",
+      submit: "Guess",
+    },
+  };
+
+  const {
+    guessTitle,
+    statusHint,
+    statusTooltip,
+    thesisHint,
+    thesisTooltip,
+    correct,
+    wrong,
+    lastProfessor,
+    placeholder,
+    submit,
+  } = texts[language];
+
+  // Récupérer un professeur aléatoire dans la base de données
+  const fetchRandomProfessor = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/professeurs/random");
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Erreur lors de la récupération du professeur :", error);
+    }
+  };
+
+  // Fonction pour récupérer ou définir le professeur du jour
+  const getTodaysProfessor = async () => {
+    const storedProfessor = localStorage.getItem("todaysProfessor");
+    const lastChanged = localStorage.getItem("lastChanged");
+    const now = new Date().getTime();
+
+    // Si le professeur existe et moins de 24h ont passé, on le garde
+    if (storedProfessor && lastChanged && now - lastChanged < 86400000) {
+      return JSON.parse(storedProfessor);
+    } else {
+      // Si plus de 24h, on récupère un nouveau professeur aléatoire
+      const newProfessor = await fetchRandomProfessor();
+      localStorage.setItem("todaysProfessor", JSON.stringify(newProfessor));
+      localStorage.setItem("lastChanged", now);
+      return newProfessor;
+    }
+  };
+
+  const [correctProfessor, setCorrectProfessor] = useState(null);
+
+  useEffect(() => {
+    // Charger le professeur dès le début
+    const fetchProfessor = async () => {
+      const professor = await getTodaysProfessor();
+      setCorrectProfessor(professor);
+    };
+
+    fetchProfessor();
+  }, []);
 
   const handleProfessorSelect = (professor) => {
     setSelectedProfessors((prevSelected) => [...prevSelected, professor]);
-    setIsCorrect(professor.nom === correctProfessor); // Adjust the comparison as needed
   };
 
-  const getExcludedProfessorsQuery = () => {
-    const excludedIds = selectedProfessors.map(prof => prof.id).join(',');
-    return excludedIds ? `&exclude=${excludedIds}` : '';
-  };
+  useEffect(() => {
+    if (selectedProfessors.length > 0) {
+      const lastSelected = selectedProfessors[selectedProfessors.length - 1];
+      setIsCorrect(lastSelected.nom === correctProfessor.nom);
+    }
+  }, [selectedProfessors, correctProfessor]);
+
+  const attempts = selectedProfessors.length;
 
   return (
     <div>
@@ -50,33 +133,33 @@ function Classic() {
 
       <main>
         <div id="subtitle">
-          <span>Devine le Professeur de Polytech Angers</span>
+          <span>{guessTitle}</span>
         </div>
 
-        {/* Game box */}
         <div className="box">
           <div className="game-container">
-            <h3>Quel professeur sera celui d'aujourd'hui ?</h3>
+            <h3>{guessTitle}</h3>
             <div className="Indices">
-              <div className="Box_Indice">
-                <img src="/img/icon-statut.png" alt="Icône 1" />
-                <p>Indice du Statut</p>
-                <div className="tooltip">Statut professionel du Professeur</div>
-              </div>
-              <div className="Box_Indice">
-                <img src="/img/icon-these.png" alt="Icône 2" />
-                <p>Indice du Sujet de Thèse</p>
-                <div className="tooltip">
-                  Nom du sujet de Thèse du Professeur
+              {attempts >= 4 && (
+                <div className="Box_Indice">
+                  <img src="/img/icon-statut.png" alt="Icone 1" />
+                  <p>{statusHint}</p>
+                  <div className="tooltip">{statusTooltip}</div>
                 </div>
-              </div>
+              )}
+              {attempts >= 8 && (
+                <div className="Box_Indice">
+                  <img src="/img/icon-these.png" alt="Icone 2" />
+                  <p>{thesisHint}</p>
+                  <div className="tooltip">{thesisTooltip}</div>
+                </div>
+              )}
             </div>
           </div>
         </div>
 
-        {/* Table with additional information */}
         <div className="classic-prof-info">
-          <table>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr>
                 <th>Photo</th>
@@ -86,96 +169,73 @@ function Classic() {
                 <th>Spécialité</th>
                 <th>Université d'études</th>
                 <th>Année PhD</th>
+                <th>Statut</th>
+                <th>Sujet thèse</th>
               </tr>
             </thead>
             <tbody>
-              {selectedProfessors.map((professor, index) => (
-                <tr key={index}>
+              {selectedProfessors.map((professor) => (
+                <tr key={professor.id} style={{ borderBottom: "1px solid #ddd" }}>
                   <td>
                     <img src={professor.photo} alt="Professor" width="100" />
                   </td>
-                  <td>{professor.genre}</td>
-                  <td>{professor.laris}</td>
-                  <td>{professor.age}</td>
-                  <td>{professor.specialite}</td>
-                  <td>{professor.universite}</td>
-                  <td>{professor.anneePhd}</td>
+                  <td style={{ backgroundColor: professor.genre === correctProfessor.genre ? "green" : "red" }}>
+                    {professor.genre}
+                  </td>
+                  <td style={{ backgroundColor: professor.laris === correctProfessor.laris ? "green" : "red" }}>
+                    {professor.laris === 1 ? "Oui" : "Non"}
+                  </td>
+                  <td style={{ backgroundColor: professor.age === correctProfessor.age ? "green" : "red" }}>
+                    {professor.age}
+                  </td>
+                  <td style={{ backgroundColor: professor.specialite === correctProfessor.specialite ? "green" : "red" }}>
+                    {professor.specialite}
+                  </td>
+                  <td style={{ backgroundColor: professor.univ_etudes === correctProfessor.univ_etudes ? "green" : "red" }}>
+                    {professor.univ_etudes}
+                  </td>
+                  <td style={{ backgroundColor: professor.annee_phd === correctProfessor.annee_phd ? "green" : "red" }}>
+                    {professor.annee_phd}
+                  </td>
+                  <td style={{ backgroundColor: professor.statut === correctProfessor.statut ? "green" : "red" }}>
+                    {professor.statut}
+                  </td>
+                  <td style={{ backgroundColor: professor.sujet_these === correctProfessor.sujet_these ? "green" : "red" }}>
+                    {professor.sujet_these}
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
 
-        {/* Professor name input with autocomplete */}
         <div className="box">
-          <form onSubmit={(e) => e.preventDefault()}>
-            <table>
-              <tbody>
-                <tr>
-                  <td className="text-input">
-                    <input
-                      id="input"
-                      type="text"
-                      placeholder="Nom du professeur"
-                      value={query}
-                      onChange={(e) => setQuery(e.target.value)}
-                    />
-                  </td>
-                  <td className="text-input">
-                    <button type="submit">Deviner</button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              setLoading(true);
+              setTimeout(() => setLoading(false), 500);
+            }}
+          >
+            <input
+              id="input"
+              type="text"
+              placeholder={placeholder}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+            <button type="submit">{submit}</button>
           </form>
 
-          {/* Display search results */}
           <Suspense fallback={<h2>Chargement...</h2>}>
-            <div style={{ opacity: isStale ? 0.5 : 1 }}>
-              <SearchResults
-                query={`${deferredQuery}${getExcludedProfessorsQuery()}`}
-                onSelect={handleProfessorSelect}
-              />
-            </div>
+            <SearchResults query={deferredQuery} onSelect={handleProfessorSelect} selectedProfessors={selectedProfessors} />
           </Suspense>
 
-          {/* Display correctness indicator */}
-          {isCorrect !== null && (
-            <div style={{ color: isCorrect ? 'green' : 'red' }}>
-              {isCorrect ? 'Correct !' : 'Faux, essayez encore !'}
-            </div>
-          )}
+          {isCorrect !== null && <div style={{ color: isCorrect ? "green" : "red", fontWeight: "bold" }}>{isCorrect ? correct : wrong}</div>}
         </div>
 
-        {/* Display the last professor to guess */}
         <div>
-          <h3>Le professeur d'hier était : {lastProfessor}</h3>
-        </div>
-
-        {/* Display previously selected professors */}
-        <div>
-          <h3>Professeurs déjà essayés :</h3>
-          <ul>
-            {selectedProfessors.map((professor, index) => (
-              <li key={index}>
-                {professor.prenom} {professor.nom}
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Promotional section */}
-        <div className="box">
-          <h1>Vous en voulez plus ?</h1>
-          <h2>Jouez à nos autres jeux !</h2>
-          <br />
-          <div>
-            <Link to="/etudiantdle" className="button-link">
-              <div className="button-game">
-                <img src="/img/etudiantdle.png" className="button-img" alt="Etudiantdle" />
-              </div>
-            </Link>
-          </div>
+          <h3>{lastProfessor} {correctProfessor && correctProfessor.nom}</h3>
         </div>
       </main>
 
