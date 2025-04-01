@@ -53,21 +53,46 @@ function Classic() {
     submit,
   } = texts[language];
 
-  // Simule le professeur à deviner aujourd'hui
-  const correctProfessor = {
-    nom: "Dupont",
-    prenom: "Jean",
-    genre: "Masculin",
-    laris: 1,
-    age: 45,
-    specialite: "Informatique",
-    univ_etudes: "Université de Nantes",
-    annee_phd: 2005,
-    statut: "Professeur",
-    sujet_these: "Etude de systèmes à événements discrets dans l'algèbre (max,+)"
+  // Récupérer un professeur aléatoire dans la base de données
+  const fetchRandomProfessor = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/professeurs/random");
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Erreur lors de la récupération du professeur :", error);
+    }
   };
 
-  const lastProfessorName = "Nom du Professeur"; // À remplacer dynamiquement
+  // Fonction pour récupérer ou définir le professeur du jour
+  const getTodaysProfessor = async () => {
+    const storedProfessor = localStorage.getItem("todaysProfessor");
+    const lastChanged = localStorage.getItem("lastChanged");
+    const now = new Date().getTime();
+
+    // Si le professeur existe et moins de 24h ont passé, on le garde
+    if (storedProfessor && lastChanged && now - lastChanged < 86400000) {
+      return JSON.parse(storedProfessor);
+    } else {
+      // Si plus de 24h, on récupère un nouveau professeur aléatoire
+      const newProfessor = await fetchRandomProfessor();
+      localStorage.setItem("todaysProfessor", JSON.stringify(newProfessor));
+      localStorage.setItem("lastChanged", now);
+      return newProfessor;
+    }
+  };
+
+  const [correctProfessor, setCorrectProfessor] = useState(null);
+
+  useEffect(() => {
+    // Charger le professeur dès le début
+    const fetchProfessor = async () => {
+      const professor = await getTodaysProfessor();
+      setCorrectProfessor(professor);
+    };
+
+    fetchProfessor();
+  }, []);
 
   const handleProfessorSelect = (professor) => {
     setSelectedProfessors((prevSelected) => [...prevSelected, professor]);
@@ -78,7 +103,7 @@ function Classic() {
       const lastSelected = selectedProfessors[selectedProfessors.length - 1];
       setIsCorrect(lastSelected.nom === correctProfessor.nom);
     }
-  }, [selectedProfessors]);
+  }, [selectedProfessors, correctProfessor]);
 
   const attempts = selectedProfessors.length;
 
@@ -209,7 +234,7 @@ function Classic() {
         </div>
 
         <div>
-          <h3>{lastProfessor} {lastProfessorName}</h3>
+          <h3>{lastProfessor} {correctProfessor && correctProfessor.nom}</h3>
         </div>
       </main>
 
