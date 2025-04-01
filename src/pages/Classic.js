@@ -1,5 +1,6 @@
 import React, { useState, useEffect, Suspense, useDeferredValue } from "react";
 import { Link } from "react-router-dom";
+import { useLanguage } from "../LanguageContext";
 import SearchResults from "../components/SearchResults.js";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -10,20 +11,63 @@ function Classic() {
   const [isCorrect, setIsCorrect] = useState(null);
   const deferredQuery = useDeferredValue(query);
   const [loading, setLoading] = useState(false);
+  const { language } = useLanguage();
 
-  // Simule le professeur à deviner aujourd'hui (remplacer par une source dynamique)
+  const texts = {
+    fr: {
+      guessTitle: "Quel professeur sera celui d'aujourd'hui ?",
+      statusHint: "Indice du Statut",
+      statusTooltip: "Statut: Professeur",
+      thesisHint: "Indice du Sujet de Thèse",
+      thesisTooltip: "Sujet de thèse: Etude de systèmes à événements discrets",
+      correct: "Correct !",
+      wrong: "Faux, essayez encore !",
+      lastProfessor: "Le professeur d'hier était :",
+      placeholder: "Nom du professeur",
+      submit: "Deviner",
+    },
+    en: {
+      guessTitle: "Which professor is today’s?",
+      statusHint: "Status Hint",
+      statusTooltip: "Status: Professor",
+      thesisHint: "Thesis Topic Hint",
+      thesisTooltip: "Thesis Topic: Study of discrete event systems",
+      correct: "Correct!",
+      wrong: "Wrong, try again!",
+      lastProfessor: "Yesterday’s professor was:",
+      placeholder: "Professor's name",
+      submit: "Guess",
+    },
+  };
+
+  const {
+    guessTitle,
+    statusHint,
+    statusTooltip,
+    thesisHint,
+    thesisTooltip,
+    correct,
+    wrong,
+    lastProfessor,
+    placeholder,
+    submit,
+  } = texts[language];
+
+  // Simule le professeur à deviner aujourd'hui
   const correctProfessor = {
     nom: "Dupont",
     prenom: "Jean",
-    genre: "Homme",
-    laris: "Oui",
+    genre: "Masculin",
+    laris: 1,
     age: 45,
     specialite: "Informatique",
     univ_etudes: "Université de Nantes",
     annee_phd: 2005,
+    statut: "Professeur",
+    sujet_these: "Etude de systèmes à événements discrets dans l'algèbre (max,+)"
   };
 
-  const lastProfessor = "Nom du Professeur"; // À remplacer dynamiquement
+  const lastProfessorName = "Nom du Professeur"; // À remplacer dynamiquement
 
   const handleProfessorSelect = (professor) => {
     setSelectedProfessors((prevSelected) => [...prevSelected, professor]);
@@ -63,25 +107,25 @@ function Classic() {
 
       <main>
         <div id="subtitle">
-          <span>Devine le Professeur de Polytech Angers</span>
+          <span>{guessTitle}</span>
         </div>
 
         <div className="box">
           <div className="game-container">
-            <h3>Quel professeur sera celui d'aujourd'hui ?</h3>
+            <h3>{guessTitle}</h3>
             <div className="Indices">
               {attempts >= 4 && (
                 <div className="Box_Indice">
-                  <img src="/img/icon-statut.png" alt="Icône 1" />
-                  <p>Indice du Statut</p>
-                  <div className="tooltip">Statut professionnel du Professeur</div>
+                  <img src="/img/icon-statut.png" alt="Icone 1" />
+                  <p>{statusHint}</p>
+                  <div className="tooltip">{statusTooltip}</div>
                 </div>
               )}
               {attempts >= 8 && (
                 <div className="Box_Indice">
-                  <img src="/img/icon-these.png" alt="Icône 2" />
-                  <p>Indice du Sujet de Thèse</p>
-                  <div className="tooltip">Nom du sujet de Thèse du Professeur</div>
+                  <img src="/img/icon-these.png" alt="Icone 2" />
+                  <p>{thesisHint}</p>
+                  <div className="tooltip">{thesisTooltip}</div>
                 </div>
               )}
             </div>
@@ -89,7 +133,7 @@ function Classic() {
         </div>
 
         <div className="classic-prof-info">
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr>
                 <th>Photo</th>
@@ -105,18 +149,34 @@ function Classic() {
             </thead>
             <tbody>
               {selectedProfessors.map((professor) => (
-                <tr key={professor.id} style={{ borderBottom: '1px solid #ddd' }}>
+                <tr key={professor.id} style={{ borderBottom: "1px solid #ddd" }}>
                   <td>
                     <img src={professor.photo} alt="Professor" width="100" />
                   </td>
-                  <td style={{ backgroundColor: professor.genre === correctProfessor.genre ? "green" : "red" }}>{professor.genre}</td>
-                  <td style={{ backgroundColor: professor.laris === correctProfessor.laris ? "green" : "red" }}> {professor.laris === 1 ? "Oui" : "Non"} </td>
-                  <td style={{ backgroundColor: professor.age === correctProfessor.age ? "green" : "red" }}>{professor.age}</td>
-                  <td style={{ backgroundColor: professor.specialite === correctProfessor.specialite ? "green" : "red" }}>{professor.specialite}</td>
-                  <td style={{ backgroundColor: professor.univ_etudes === correctProfessor.univ_etudes ? "green" : "red" }}>{professor.univ_etudes}</td>
-                  <td style={{ backgroundColor: professor.annee_phd === correctProfessor.annee_phd ? "green" : "red" }}>{professor.annee_phd}</td>
-                  <td style={{ backgroundColor: professor.statut === correctProfessor.statut ? "green" : "red" }}>{professor.statut}</td>
-                  <td style={{ backgroundColor: professor.sujet_these === correctProfessor.sujet_these ? "green" : "red" }}>{professor.sujet_these}</td>
+                  <td style={{ backgroundColor: professor.genre === correctProfessor.genre ? "green" : "red" }}>
+                    {professor.genre}
+                  </td>
+                  <td style={{ backgroundColor: professor.laris === correctProfessor.laris ? "green" : "red" }}>
+                    {professor.laris === 1 ? "Oui" : "Non"}
+                  </td>
+                  <td style={{ backgroundColor: professor.age === correctProfessor.age ? "green" : "red" }}>
+                    {professor.age}
+                  </td>
+                  <td style={{ backgroundColor: professor.specialite === correctProfessor.specialite ? "green" : "red" }}>
+                    {professor.specialite}
+                  </td>
+                  <td style={{ backgroundColor: professor.univ_etudes === correctProfessor.univ_etudes ? "green" : "red" }}>
+                    {professor.univ_etudes}
+                  </td>
+                  <td style={{ backgroundColor: professor.annee_phd === correctProfessor.annee_phd ? "green" : "red" }}>
+                    {professor.annee_phd}
+                  </td>
+                  <td style={{ backgroundColor: professor.statut === correctProfessor.statut ? "green" : "red" }}>
+                    {professor.statut}
+                  </td>
+                  <td style={{ backgroundColor: professor.sujet_these === correctProfessor.sujet_these ? "green" : "red" }}>
+                    {professor.sujet_these}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -131,47 +191,28 @@ function Classic() {
               setTimeout(() => setLoading(false), 500);
             }}
           >
-            <table>
-              <tbody>
-                <tr>
-                  <td className="text-input">
-                    <input
-                      id="input"
-                      type="text"
-                      placeholder="Nom du professeur"
-                      value={query}
-                      onChange={(e) => setQuery(e.target.value)}
-                    />
-                  </td>
-                  <td className="text-input">
-                    <button type="submit">Deviner</button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <input
+              id="input"
+              type="text"
+              placeholder={placeholder}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+            <button type="submit">{submit}</button>
           </form>
 
           <Suspense fallback={<h2>Chargement...</h2>}>
-            <div style={{ opacity: loading ? 0.5 : 1 }}>
-              <SearchResults
-                query={deferredQuery}
-                onSelect={handleProfessorSelect}
-                selectedProfessors={selectedProfessors}
-              />
-            </div>
+            <SearchResults query={deferredQuery} onSelect={handleProfessorSelect} selectedProfessors={selectedProfessors} />
           </Suspense>
 
-          {isCorrect !== null && (
-            <div style={{ color: isCorrect ? 'green' : 'red', fontWeight: 'bold' }}>
-              {isCorrect ? ' Correct !' : ' Faux, essayez encore !'}
-            </div>
-          )}
+          {isCorrect !== null && <div style={{ color: isCorrect ? "green" : "red", fontWeight: "bold" }}>{isCorrect ? correct : wrong}</div>}
         </div>
 
         <div>
-          <h3>Le professeur d'hier était : {lastProfessor}</h3>
+          <h3>{lastProfessor} {lastProfessorName}</h3>
         </div>
       </main>
+
       <Footer />
     </div>
   );
