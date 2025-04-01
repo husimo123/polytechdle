@@ -99,6 +99,8 @@ function Classic() {
                 <th>Spécialité</th>
                 <th>Université d'études</th>
                 <th>Année PhD</th>
+                <th>Statut</th>
+                <th>Sujet thèse</th>
               </tr>
             </thead>
             <tbody>
@@ -108,11 +110,13 @@ function Classic() {
                     <img src={professor.photo} alt="Professor" width="100" />
                   </td>
                   <td style={{ backgroundColor: professor.genre === correctProfessor.genre ? "green" : "red" }}>{professor.genre}</td>
-                  <td style={{ backgroundColor: professor.laris === correctProfessor.laris ? "green" : "red" }}>{professor.laris}</td>
+                  <td style={{ backgroundColor: professor.laris === correctProfessor.laris ? "green" : "red" }}> {professor.laris === 1 ? "Oui" : "Non"} </td>
                   <td style={{ backgroundColor: professor.age === correctProfessor.age ? "green" : "red" }}>{professor.age}</td>
                   <td style={{ backgroundColor: professor.specialite === correctProfessor.specialite ? "green" : "red" }}>{professor.specialite}</td>
                   <td style={{ backgroundColor: professor.univ_etudes === correctProfessor.univ_etudes ? "green" : "red" }}>{professor.univ_etudes}</td>
                   <td style={{ backgroundColor: professor.annee_phd === correctProfessor.annee_phd ? "green" : "red" }}>{professor.annee_phd}</td>
+                  <td style={{ backgroundColor: professor.statut === correctProfessor.statut ? "green" : "red" }}>{professor.statut}</td>
+                  <td style={{ backgroundColor: professor.sujet_these === correctProfessor.sujet_these ? "green" : "red" }}>{professor.sujet_these}</td>
                 </tr>
               ))}
             </tbody>
@@ -159,7 +163,7 @@ function Classic() {
 
           {isCorrect !== null && (
             <div style={{ color: isCorrect ? 'green' : 'red', fontWeight: 'bold' }}>
-              {isCorrect ? '✅ Correct !' : '❌ Faux, essayez encore !'}
+              {isCorrect ? ' Correct !' : ' Faux, essayez encore !'}
             </div>
           )}
         </div>
