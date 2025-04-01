@@ -1,9 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
-export default function SearchResults({ query, onSelect }) {
+export default function SearchResults({ query, onSelect, exclude = [] }) {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [selectedProfs, setSelectedProfs] = useState(new Set());
 
   useEffect(() => {
     if (query.trim() === "") {
@@ -16,7 +15,10 @@ export default function SearchResults({ query, onSelect }) {
       try {
         const response = await fetch(`http://localhost:5000/search?q=${query}`);
         const data = await response.json();
-        setResults(data);
+        
+        // Exclure les professeurs déjà tentés
+        const filteredResults = data.filter(prof => !exclude.includes(prof.nom));
+        setResults(filteredResults);
       } catch (error) {
         console.error("Erreur lors de la récupération des résultats :", error);
       } finally {
@@ -25,20 +27,7 @@ export default function SearchResults({ query, onSelect }) {
     };
 
     fetchResults();
-  }, [query]);
-
-  const toggleSelect = (prof) => {
-    setSelectedProfs((prevSelected) => {
-      const newSelected = new Set(prevSelected);
-      if (newSelected.has(prof.id)) {
-        newSelected.delete(prof.id);
-      } else {
-        newSelected.add(prof.id);
-      }
-      return newSelected;
-    });
-    onSelect(prof);
-  };
+  }, [query, exclude]); // Ajout de `exclude` dans les dépendances
 
   if (loading) {
     return <p>Chargement...</p>;
@@ -53,15 +42,11 @@ export default function SearchResults({ query, onSelect }) {
       {results.map((prof, index) => (
         <li
           key={index}
-          className={`search-item ${selectedProfs.has(prof.id) ? 'selected' : ''}`}
-          onClick={() => toggleSelect(prof)}
-          style={{ cursor: 'pointer' }}
+          className="search-item"
+          onClick={() => onSelect(prof)}
+          style={{ cursor: "pointer" }}
         >
-          <img
-            src={prof.photo}
-            alt={`${prof.prenom} ${prof.nom}`}
-            className="prof-photo"
-          />
+          <img src={prof.photo} alt={`${prof.prenom} ${prof.nom}`} className="prof-photo" />
           <span>{prof.prenom} {prof.nom}</span>
         </li>
       ))}
