@@ -28,9 +28,9 @@ function Classic() {
     fr: {
       guessTitle: "Quel professeur sera celui d'aujourd'hui ?",
       statusHint: "Indice du Statut",
-      statusTooltip: "Statut: Professeur",
+      statusTooltip: "Statut: ",
       thesisHint: "Indice du Sujet de Thèse",
-      thesisTooltip: "Sujet de thèse: Etude de systèmes à événements discrets",
+      thesisTooltip: "Sujet de thèse: ",
       correct: "Correct !",
       wrong: "Faux, essayez encore !",
       lastProfessor: "Le professeur d'hier était :",
@@ -40,9 +40,9 @@ function Classic() {
     en: {
       guessTitle: "Which professor is today’s?",
       statusHint: "Status Hint",
-      statusTooltip: "Status: Professor",
+      statusTooltip: "Status: ",
       thesisHint: "Thesis Topic Hint",
-      thesisTooltip: "Thesis Topic: Study of discrete event systems",
+      thesisTooltip: "Thesis Topic: ",
       correct: "Correct!",
       wrong: "Wrong, try again!",
       lastProfessor: "Yesterday’s professor was:",
@@ -214,7 +214,7 @@ function Classic() {
 
         <div>
           <hr className="separator" />
-          <h3>Le professeur d'hier était : {lastProfessor}</h3>
+          <h3>{lastProfessor}</h3>
         </div>
 
         <div className="box">
