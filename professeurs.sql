@@ -28,17 +28,18 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `professeurs` (
-  `nom` varchar(128) NOT NULL,
-  `prenom` varchar(128) NOT NULL,
-  `genre` varchar(128) NOT NULL, 
-  `laris` tinyint(1) NOT NULL,
-  `age` int(11) NOT NULL,
-  `specialite` varchar(128) NOT NULL,
-  `univ_etudes` varchar(128) NOT NULL,
-  `annee_phd` int(11) NOT NULL,
-  `statut` varchar(256) NOT NULL,
-  `sujet_these` varchar(1024) NOT NULL,
-  `photo` varchar(2048) NOT NULL
+  `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `nom` VARCHAR(128) NOT NULL,
+  `prenom` VARCHAR(128) NOT NULL,
+  `genre` VARCHAR(128) NOT NULL, 
+  `laris` TINYINT(1) NOT NULL,
+  `age` INT(11) NOT NULL,
+  `specialite` VARCHAR(128) NOT NULL,
+  `univ_etudes` VARCHAR(128) NOT NULL,
+  `annee_phd` INT(11) NOT NULL,
+  `statut` VARCHAR(256) NOT NULL,
+  `sujet_these` VARCHAR(1024) NOT NULL,
+  `photo` VARCHAR(2048) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Infos sur les profs';
 
 --
@@ -68,3 +69,12 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+CREATE TABLE `professeurs_du_jour` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `date` DATE NOT NULL DEFAULT (CURRENT_DATE),
+    `mode` ENUM('classic', 'phd', 'photo') NOT NULL,
+    `professeur_id` INT UNSIGNED NOT NULL,
+    FOREIGN KEY (`professeur_id`) REFERENCES `professeurs`(`id`) ON DELETE CASCADE,
+    UNIQUE KEY `unique_professeur` (`date`, `mode`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Professeurs du jour par mode de jeu';

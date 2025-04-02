@@ -17,12 +17,12 @@ function PhD() {
 
   // Get data from the database
   useEffect(() => {
-    fetch('http://localhost:5000/professeur-du-jour')
+    fetch("http://localhost:5000/professeur-du-jour/phd")
         .then(response => response.json())
         .then(data => setProfesseur(data))
-        .catch(error => console.error('Erreur:', error));
-
+        .catch(error => console.error("Erreur:", error));
   }, []);
+
   
   const handleSelect = (prof) => {
     if (gameOver || attempts.some((attempt) => attempt.nom === prof.nom)) return;
