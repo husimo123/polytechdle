@@ -18,9 +18,9 @@ function Photo() {
   const [gameOver, setGameOver] = useState(false);
   
   // Gestion des données de la page
-  const [blurMode, setBlurMode] = useState(true); // Blur image avec chaque guess
-  const [colorMode, setColorMode] = useState(true); // colorimétrie de l'image
-  
+  const [blurMode, setBlurMode] = useState(false); // Blur image avec chaque guess
+  const [colorMode, setColorMode] = useState(false); // colorimétrie de l'image
+  const [blur, setBlurimg] = useState(true); // Blur image 
   // Get data from the database
   useEffect(() => {
     fetch('http://localhost:5000/professeur-du-jour')
@@ -43,7 +43,7 @@ function Photo() {
     if (isCorrect) {
       setGameOver(true);
       ///////////////////////////////////////////////////////
-      setBlurMode(15); 
+      setBlurimg(false);
       // Il faut trouver autre chose ici pour montrer l'image en claire quand on a trouvé le bon prof
       ///////////////////////////////////////////////////////
     }
@@ -77,11 +77,15 @@ function Photo() {
           </li>
         </ul>
       </nav>
-
+      
+     
       <main>
         <div id="subtitle">
           <span>Devine le Professeur de Polytech Angers</span>
         </div>
+
+
+<script src="../components/confetti.js"></script>
 
         {/* Jeu */}
         <div className="box">
@@ -96,19 +100,24 @@ function Photo() {
               width="200"
               height="200"
               style={
+                
                // Blur the image and color considering the choice of the user.
                // Adaptive blur and grey 
-                blurMode && colorMode ? {
+               !blur ? { // if the game is won : Clear filters from image
+                filter: `grayscale(0%) blur(0px)`, 
+                WebkitFilter: `grayscale(0%) blur(0px)`, 
+               }:
+                blurMode && !colorMode ? {
                   filter: `grayscale(100%) blur(${Math.max(0, 15 - attempts.length)}px)`, // progressively reduce the blur on the image
                   WebkitFilter: `grayscale(100%) blur(${Math.max(15 - attempts.length)}px)`, 
                 } :
                 //Full blur and grey
-                !blurMode && colorMode ? {
+                !blurMode && !colorMode ? {
                   filter: `grayscale(100%) blur(${15}px)`,
                   WebkitFilter: `grayscale(100%) blur(${15}px)`,
                 }:
                 // Adaptive blur and colors
-                  blurMode && !colorMode ?
+                  blurMode && colorMode ?
                 {
                   filter: `blur(${Math.max(0, 15 - attempts.length)}px)`, // progressively reduce the blur on the image
                   WebkitFilter: `blur(${Math.max(15 - attempts.length)}px)`, 
@@ -135,7 +144,7 @@ function Photo() {
                         <input
                           type="checkbox"
                           checked={blurMode}
-                          onChange={() => setBlurMode(!blurMode)}
+                          onChange={() => setBlurMode(!blurMode)} // Changer l'etat boutton et du l'image par conséquence (flouté)
                         />
                         <span className="slider round"></span>
                       </label>
@@ -147,7 +156,7 @@ function Photo() {
                         <input
                           type="checkbox"
                           checked={colorMode}
-                          onChange={() => setColorMode(!colorMode)}
+                          onChange={() => setColorMode(!colorMode)} // Changer l'etat boutton et du l'image par conséquence (couleur)
                         />
                         <span className="slider round"></span>
                       </label>
