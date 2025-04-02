@@ -91,20 +91,8 @@ function Home() {
           </div>
         </div>
 
-        {/* Affichage du professeur du jour */}
-        <div className="prof-container">
-          <h2>{profOfTheDay}</h2>
-          {professeur ? (
-            <div className="prof-card">
-              <h3>{professeur.prenom} {professeur.nom}</h3>
-              <p>{specialty} : {professeur.specialite}</p>
-              <p>{university} : {professeur.univ_etudes}</p>
-              <img src={professeur.photo} alt="Photo du professeur" className="prof-img" />
-            </div>
-          ) : (
-            <p>{loading}</p>
-          )}
-        </div>
+        
+        
       </main>
       <Footer />
     </div>
