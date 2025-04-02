@@ -213,7 +213,8 @@ function Classic() {
                     {professor.laris === 1 ? "Yes" : "No"}
                   </td>
                   <td style={{ backgroundColor: professor.age === professeur.age ? "green" : "red" }}>
-                    {professor.age}
+                    { professor.age === professeur.age ? professor.age   
+                    :professor.age < professeur.age ? professor.age + "↑" : professor.age + "↓" }
                   </td>
                   <td style={{ backgroundColor: professor.specialite === professeur.specialite ? "green" : "red" }}>
                     {professor.specialite}
@@ -222,7 +223,8 @@ function Classic() {
                     {professor.univ_etudes}
                   </td>
                   <td style={{ backgroundColor: professor.annee_phd === professeur.annee_phd ? "green" : "red" }}>
-                    {professor.annee_phd}
+                    { professor.annee_phd === professeur.annee_phd ? professor.annee_phd   
+                    : professor.annee_phd < professeur.annee_phd ? professor.annee_phd + "↑" : professor.annee_phd + "↓" } 
                   </td>
                   <td style={{ backgroundColor: professor.statut === professeur.statut ? "green" : "red" }}>
                     {professor.statut}
