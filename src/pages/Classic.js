@@ -18,7 +18,7 @@ function Classic() {
 
   // Get data from the database
   useEffect(() => {
-    fetch('http://localhost:5000/professeur-du-jour')
+    fetch('http://localhost:5000/professeur-du-jour/classic')
         .then(response => response.json())
         .then(data => setProfesseur(data))
         .catch(error => console.error('Erreur:', error));
