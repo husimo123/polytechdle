@@ -36,6 +36,18 @@ function Classic() {
       lastProfessor: "Le professeur d'hier était :",
       placeholder: "Nom du professeur",
       submit: "Deviner",
+      attemptsText: "tentatives",
+      tableHeaders: {
+        photo: "Photo",
+        genre: "Genre",
+        laris: "Laris",
+        age: "Âge",
+        specialite: "Spécialité",
+        univ_etudes: "Université d'études",
+        annee_phd: "Année PhD",
+        statut: "Statut",
+        sujet_these: "Sujet thèse",
+      },
     },
     en: {
       guessTitle: "Which professor is today’s?",
@@ -48,6 +60,18 @@ function Classic() {
       lastProfessor: "Yesterday’s professor was:",
       placeholder: "Professor's name",
       submit: "Guess",
+      attemptsText: "attempts",
+      tableHeaders: {
+        photo: "Photo",
+        genre: "Gender",
+        laris: "Laris",
+        age: "Age",
+        specialite: "Specialty",
+        univ_etudes: "University of Studies",
+        annee_phd: "PhD Year",
+        statut: "Status",
+        sujet_these: "Thesis Topic",
+      },
     },
   };
 
@@ -62,6 +86,8 @@ function Classic() {
     lastProfessor,
     placeholder,
     submit,
+    attemptsText,
+    tableHeaders,
   } = texts[language];
 
   const handleSelect = (prof) => {
@@ -117,13 +143,13 @@ function Classic() {
               <div className={`Box_Indice ${attempts.length < 4 ? "disabled" : ""}`}>
                 <img src="/img/icon-statut.png" alt="Icone 1" />
                 <p>{statusHint}</p>
-                {attempts.length < 4 && <p><span className="small-italic">Dans  {4 - attempts.length} Essais</span></p>}
+                {attempts.length < 4 && <p><span className="small-italic">In {4 - attempts.length} {attemptsText}</span></p>}
                 {attempts.length >= 4 && <div className="tooltip">{statusTooltip} {professeur.statut}</div>}
               </div>
               <div className={`Box_Indice ${attempts.length < 8 ? "disabled" : ""}`}>
                 <img src="/img/icon-these.png" alt="Icone 2" />
                 <p>{thesisHint}</p>
-                {attempts.length < 8 && <p><span className="small-italic">Dans  {8 - attempts.length} Essais</span></p>}
+                {attempts.length < 8 && <p><span className="small-italic">In {8 - attempts.length} {attemptsText}</span></p>}
                 {attempts.length >= 8 && <div className="tooltip">{thesisTooltip} {professeur.sujet_these}</div>}
               </div>
             </div>
@@ -139,20 +165,20 @@ function Classic() {
                     <input
                       id="input"
                       type="text"
-                      placeholder="Nom du professeur"
+                      placeholder={placeholder}
                       value={query}
                       onChange={(e) => setQuery(e.target.value)}
                       disabled={gameOver}
                     />
                   </td>
                   <td className="text-input">
-                    <button type="submit" disabled={gameOver}>Deviner</button>
+                    <button type="submit" disabled={gameOver}>{submit}</button>
                   </td>
                 </tr>
               </tbody>
             </table>
           </form>
-          <Suspense fallback={<h2>Chargement...</h2>}>
+          <Suspense fallback={<h2>Loading...</h2>}>
             <div style={{ opacity: isStale ? 0.5 : 1 }}>
               {!gameOver && <SearchResults query={deferredQuery} onSelect={handleSelect} exclude={attempts.map(a => a.nom)} />}
             </div>
@@ -163,19 +189,19 @@ function Classic() {
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr>
-                <th>Photo</th>
-                <th>Genre</th>
-                <th>Laris</th>
-                <th>Âge</th>
-                <th>Spécialité</th>
-                <th>Université d'études</th>
-                <th>Année PhD</th>
-                <th>Statut</th>
-                <th>Sujet thèse</th>
+                <th>{tableHeaders.photo}</th>
+                <th>{tableHeaders.genre}</th>
+                <th>{tableHeaders.laris}</th>
+                <th>{tableHeaders.age}</th>
+                <th>{tableHeaders.specialite}</th>
+                <th>{tableHeaders.univ_etudes}</th>
+                <th>{tableHeaders.annee_phd}</th>
+                <th>{tableHeaders.statut}</th>
+                <th>{tableHeaders.sujet_these}</th>
               </tr>
             </thead>
             <tbody>
-              {attempts.map((professor,index) => (
+              {attempts.map((professor, index) => (
                 <tr key={index} style={{ borderBottom: "1px solid #ddd" }}>
                   <td>
                     <img src={professor.photo} alt="Professor" width="100" />
@@ -184,7 +210,7 @@ function Classic() {
                     {professor.genre}
                   </td>
                   <td style={{ backgroundColor: professor.laris === professeur.laris ? "green" : "red" }}>
-                    {professor.laris === 1 ? "Oui" : "Non"}
+                    {professor.laris === 1 ? "Yes" : "No"}
                   </td>
                   <td style={{ backgroundColor: professor.age === professeur.age ? "green" : "red" }}>
                     {professor.age}
@@ -210,7 +236,7 @@ function Classic() {
           </table>
         </div>
 
-        {gameOver && <h3>Bravo ! Vous avez trouvé le professeur du jour : {professeur.prenom} {professeur.nom} 🎉</h3>}
+        {gameOver && <h3>Congratulations! You guessed today’s professor: {professeur.prenom} {professeur.nom} 🎉</h3>}
 
         <div>
           <hr className="separator" />
@@ -218,8 +244,8 @@ function Classic() {
         </div>
 
         <div className="box">
-          <h1>Vous en voulez plus ?</h1>
-          <h2>Jouez à nos autres jeux !</h2>
+          <h1>Want more?</h1>
+          <h2>Play our other games!</h2>
           <br />
           <div>
             <Link to="/etudiantdle" className="button-link">

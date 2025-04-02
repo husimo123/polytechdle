@@ -5,6 +5,7 @@ import SearchResults from "../components/SearchResults.js";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Professeur from "../components/Professeur.js";
+import { useLanguage } from "../LanguageContext";
 
 function PhD() {
   const [query, setQuery] = useState("");
@@ -14,6 +15,7 @@ function PhD() {
   const [professeur, setProfesseur] = useState(null);
   const lastProfessor = "Nom du Professeur";
   const [gameOver, setGameOver] = useState(false);
+  const { language } = useLanguage();
 
   // Get data from the database
   useEffect(() => {
@@ -42,6 +44,43 @@ function PhD() {
     if (!query.trim() || gameOver) return;
   };
 
+  const texts = {
+    fr: {
+      subtitle: "Devine le Professeur de Polytech Angers",
+      phdTitle: "Quel professeur a obtenu son diplôme PhD cette année ?",
+      ageHint: "Indice Âge",
+      specialtyHint: "Indice Spécialité",
+      attemptsRemaining: "Dans {n} Essais",
+      correctGuess: "Bravo ! Vous avez trouvé le professeur du jour :",
+      lastProfessor: "Le professeur d'hier était :",
+      placeholder: "Nom du professeur",
+      submit: "Deviner",
+    },
+    en: {
+      subtitle: "Guess the Professor from Polytech Angers",
+      phdTitle: "Which professor earned their PhD this year?",
+      ageHint: "Age Hint",
+      specialtyHint: "Specialty Hint",
+      attemptsRemaining: "In {n} attempts",
+      correctGuess: "Congrats! You’ve found today’s professor:",
+      lastProfessor: "Yesterday’s professor was:",
+      placeholder: "Professor's name",
+      submit: "Guess",
+    },
+  };
+
+  const {
+    subtitle,
+    phdTitle,
+    ageHint,
+    specialtyHint,
+    attemptsRemaining,
+    correctGuess,
+    lastProfessor: lastProfessorText,
+    placeholder,
+    submit,
+  } = texts[language];
+
   return (
     <div>
       <Header />
@@ -67,24 +106,24 @@ function PhD() {
 
       <main>
         <div id="subtitle">
-          <span>Devine le Professeur de Polytech Angers</span>
+          <span>{subtitle}</span>
         </div>
 
         <div className="box">
           <div className="game-container">
-            <h3>Quel professeur a obtenu son diplôme PhD cette année ?</h3>
+            <h3>{phdTitle}</h3>
             <div className="PhD_Année">{professeur ? professeur.annee_phd : "Chargement..."}</div>
             <div className="Indices">
               <div className={`Box_Indice ${attempts.length < 3 ? "disabled" : ""}`}>
                 <img src="/img/icon-age.png" alt="Icône 1" />
-                <p>Indice Âge</p>
-                {attempts.length < 3 && <p><span className="small-italic">Dans {3 - attempts.length} Essais</span></p>}
+                <p>{ageHint}</p>
+                {attempts.length < 3 && <p><span className="small-italic">{attemptsRemaining.replace("{n}", 3 - attempts.length)}</span></p>}
                 {attempts.length >= 3 && <div className="tooltip">Âge du Professeur : {professeur.age}</div>}
               </div>
               <div className={`Box_Indice ${attempts.length < 6 ? "disabled" : ""}`}>
                 <img src="/img/icon-specialite.png" alt="Icône 2" />
-                <p>Indice Spécialité</p>
-                {attempts.length < 6 && <p><span className="small-italic">Dans  {6 - attempts.length} Essais</span></p>}
+                <p>{specialtyHint}</p>
+                {attempts.length < 6 && <p><span className="small-italic">{attemptsRemaining.replace("{n}", 6 - attempts.length)}</span></p>}
                 {attempts.length >= 6 && <div className="tooltip">Spécialité : {professeur.specialite}</div>}
               </div>
             </div>
@@ -100,14 +139,14 @@ function PhD() {
                     <input
                       id="input"
                       type="text"
-                      placeholder="Nom du professeur"
+                      placeholder={placeholder}
                       value={query}
                       onChange={(e) => setQuery(e.target.value)}
                       disabled={gameOver}
                     />
                   </td>
                   <td className="text-input">
-                    <button type="submit" disabled={gameOver}>Deviner</button>
+                    <button type="submit" disabled={gameOver}>{submit}</button>
                   </td>
                 </tr>
               </tbody>
@@ -135,11 +174,11 @@ function PhD() {
           </ul>
         </div>
 
-        {gameOver && <h3>Bravo ! Vous avez trouvé le professeur du jour : {professeur.prenom} {professeur.nom} 🎉</h3>}
+        {gameOver && <h3>{correctGuess} {professeur.prenom} {professeur.nom} 🎉</h3>}
 
         <div>
           <hr className="separator" />
-          <h3>Le professeur d'hier était : {lastProfessor}</h3>
+          <h3>{lastProfessorText} {lastProfessor}</h3>
         </div>
 
         <div className="box">

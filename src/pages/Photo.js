@@ -1,11 +1,10 @@
 /* eslint-disable jsx-a11y/img-redundant-alt */
-import React, {  useEffect, useState, Suspense, useDeferredValue  } from "react";
+import React, { useEffect, useState, Suspense, useDeferredValue } from "react";
 import { Link } from "react-router-dom";
 import SearchResults from "../components/SearchResults.js";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Professeur from "../components/Professeur.js";
-
 
 function Photo() {
   // Appel a la base
@@ -13,7 +12,7 @@ function Photo() {
   const [attempts, setAttempts] = useState([]);
   const deferredQuery = useDeferredValue(query);
   const isStale = query !== deferredQuery;
-  const lastProfessor = "Nom du Professeur"; // À remplacer dynamiquement
+  const lastProfessor = "Professor's Name"; // À remplacer dynamiquement
   const [professeur, setProfesseur] = useState(null);
   const [gameOver, setGameOver] = useState(false);
   
@@ -80,24 +79,22 @@ function Photo() {
 
       <main>
         <div id="subtitle">
-          <span>Devine le Professeur de Polytech Angers</span>
+          <span>Guess the Professor from Polytech Angers</span> {/* Changer le texte ici */}
         </div>
 
         {/* Jeu */}
         <div className="box">
           <div className="game-container">
-            <h3>Quel professeur de Polytech figure sur la photo suivante ?</h3>
+            <h3>Which Polytech professor is in the following photo?</h3> {/* Changer le texte ici */}
             <br />
-            {/* Verification que l'objet professeur n'est pas vide pour eviter le crash de la page. */}
+            {/* Vérification que l'objet professeur n'est pas vide pour éviter le crash de la page */}
             {professeur ? (
             <img
               src={professeur.photo}
-              alt="Photo prof"
+              alt="Professor photo"
               width="200"
               height="200"
-              style={
-               // Blur the image and color considering the choice of the user.
-               // Adaptive blur and grey 
+              style={ // Blur the image and color considering the choice of the user.
                 blurMode && colorMode ? {
                   filter: `grayscale(100%) blur(${Math.max(0, 15 - attempts.length)}px)`, // progressively reduce the blur on the image
                   WebkitFilter: `grayscale(100%) blur(${Math.max(15 - attempts.length)}px)`, 
@@ -121,10 +118,10 @@ function Photo() {
               }
             />
           ) : ( // si l'objet est vide on affiche :
-              <p>Erreur de chargement...</p>
+              <p>Loading Error...</p> 
             )}
             <br></br>
-            <p>Nombre d'essais :{attempts.length}</p>
+            <p>Number of attempts: {attempts.length}</p> {/* Traduction de "Nombre d'essais" */}
             {/* Options de jeu */}
             <div>
               <table id="button-choice">
@@ -140,7 +137,7 @@ function Photo() {
                         <span className="slider round"></span>
                       </label>
                       <br />
-                      <label>Chaque essai réduit le flou</label>
+                      <label>Each attempt reduces the blur</label> {/* Traduction de "Chaque essai réduit le flou" */}
                     </td>
                     <td>
                       <label className="switch">
@@ -152,7 +149,7 @@ function Photo() {
                         <span className="slider round"></span>
                       </label>
                       <br />
-                      <label>Afficher les couleurs</label>
+                      <label>Show colors</label> {/* Traduction de "Afficher les couleurs" */}
                     </td>
                   </tr>
                 </tbody>
@@ -171,20 +168,20 @@ function Photo() {
                     <input
                       id="input"
                       type="text"
-                      placeholder="Nom du professeur"
+                      placeholder="Professor's name"
                       value={query}
                       onChange={(e) => setQuery(e.target.value)}
                       disabled={gameOver}
                     />
                   </td>
                   <td className="text-input">
-                    <button type="submit" disabled={gameOver}>Deviner</button>
+                    <button type="submit" disabled={gameOver}>Guess</button> {/* Traduction de "Deviner" */}
                   </td>
                 </tr>
               </tbody>
             </table>
           </form>
-          <Suspense fallback={<h2>Chargement...</h2>}>
+          <Suspense fallback={<h2>Loading...</h2>}> {/* Traduction de "Chargement..." */}
             <div style={{ opacity: isStale ? 0.5 : 1 }}>
               {!gameOver && <SearchResults query={deferredQuery} onSelect={handleSelect} exclude={attempts.map(a => a.nom)} />}
             </div>
@@ -206,17 +203,17 @@ function Photo() {
           </ul>
         </div>
 
-        {gameOver && <h3>Bravo ! Vous avez trouvé le professeur du jour : {professeur.prenom} {professeur.nom} 🎉</h3>}
+        {gameOver && <h3>Congratulations! You found the professor of the day: {professeur.prenom} {professeur.nom} 🎉</h3>} {/* Traduction de "Bravo ! Vous avez trouvé le professeur du jour" */}
 
         <div>
           <hr className="separator" />
-          <h3>Le professeur d'hier était : {lastProfessor}</h3>
+          <h3>The professor from yesterday was: {lastProfessor}</h3> {/* Traduction de "Le professeur d'hier était" */}
         </div>
 
         {/* Section promotionnelle */}
         <div className="box">
-          <h1>Vous en voulez plus ?</h1>
-          <h2>Jouez à nos autres jeux !</h2>
+          <h1>Want more?</h1> {/* Traduction de "Vous en voulez plus ?" */}
+          <h2>Play our other games!</h2> {/* Traduction de "Jouez à nos autres jeux !" */}
           <br />
           <div>
             <Link to="/etudiantdle" className="button-link">
