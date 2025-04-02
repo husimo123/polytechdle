@@ -5,9 +5,10 @@ import SearchResults from "../components/SearchResults.js";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Professeur from "../components/Professeur.js";
+import Cookies from 'js-cookie'; // Importation de js-cookie
 
 function Photo() {
-  // Appel a la base
+  // Appel à la base
   const [query, setQuery] = useState("");
   const [attempts, setAttempts] = useState([]);
   const deferredQuery = useDeferredValue(query);
@@ -15,20 +16,62 @@ function Photo() {
   const lastProfessor = "Professor's Name"; // À remplacer dynamiquement
   const [professeur, setProfesseur] = useState(null);
   const [gameOver, setGameOver] = useState(false);
-  
+
   // Gestion des données de la page
-  const [blurMode, setBlurMode] = useState(true); // Blur image avec chaque guess
-  const [colorMode, setColorMode] = useState(true); // colorimétrie de l'image
-  
+  const [blurMode, setBlurMode] = useState(false); // Blur image avec chaque guess
+  const [colorMode, setColorMode] = useState(false); // colorimétrie de l'image
+  const [blur, setBlurimg] = useState(true); // Blur image 
+
   // Get data from the database
   useEffect(() => {
-    fetch('http://localhost:5000/professeur-du-jour')
+    fetch('http://localhost:5000/professeur-du-jour/photo')
        .then(response => response.json())
        .then(data => setProfesseur(data))
        .catch(error => console.error('Erreur:', error));
   }, []);
 
-  // Gestiond du bouton deviner
+  // Chargement et sauvegarde des statistiques avec js-cookie
+  const loadStatistics = (mode) => {
+    const stats = Cookies.get(`${mode}Stats`);
+    if (stats) {
+      return JSON.parse(stats);
+    } else {
+      return {
+        totalGames: 0,
+        totalWins: 0,
+        totalAttempts: 0,
+        longestWinStreak: 0,
+        currentWinStreak: 0,
+        attemptsPerGame: [],
+        winDates: []
+      };
+    }
+  };
+
+  const saveStatistics = (mode, stats) => {
+    Cookies.set(`${mode}Stats`, JSON.stringify(stats));
+  };
+
+  // Met à jour les statistiques après une partie
+  const updateStatistics = (mode, win, attempts) => {
+    let stats = loadStatistics(mode);
+    stats.totalGames += 1;
+    stats.totalAttempts += attempts;
+    stats.attemptsPerGame.push(attempts);
+    if (win) {
+      stats.totalWins += 1;
+      stats.currentWinStreak += 1;
+      if (stats.currentWinStreak > stats.longestWinStreak) {
+        stats.longestWinStreak = stats.currentWinStreak;
+      }
+      stats.winDates.push(new Date().toLocaleDateString());
+    } else {
+      stats.currentWinStreak = 0;
+    }
+    saveStatistics(mode, stats);
+  };
+
+  // Gestion du bouton deviner
   const handleSelect = (prof) => {
     if (gameOver || attempts.some((attempt) => attempt.nom === prof.nom)) return;
     
@@ -39,20 +82,20 @@ function Photo() {
     );
     
     setAttempts((prevAttempts) => [newAttempt, ...prevAttempts]);
+
+    // Incrémenter les statistiques quand la partie se termine
     if (isCorrect) {
+      updateStatistics("photo", true, attempts.length + 1);
       setGameOver(true);
-      ///////////////////////////////////////////////////////
-      setBlurMode(15); 
-      // Il faut trouver autre chose ici pour montrer l'image en claire quand on a trouvé le bon prof
-      ///////////////////////////////////////////////////////
+      setBlurimg(false); // Déblur l'image quand on devine correctement
     }
   };
-  
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!query.trim() || gameOver) return;
     console.log(attempts.length);
-  };  
+  };
 
   return (
     <div>
@@ -79,13 +122,13 @@ function Photo() {
 
       <main>
         <div id="subtitle">
-          <span>Guess the Professor from Polytech Angers</span> {/* Changer le texte ici */}
+          <span>Guess the Professor from Polytech Angers</span>
         </div>
 
         {/* Jeu */}
         <div className="box">
           <div className="game-container">
-            <h3>Which Polytech professor is in the following photo?</h3> {/* Changer le texte ici */}
+            <h3>Which Polytech professor is in the following photo?</h3>
             <br />
             {/* Vérification que l'objet professeur n'est pas vide pour éviter le crash de la page */}
             {professeur ? (
@@ -95,17 +138,21 @@ function Photo() {
               width="200"
               height="200"
               style={ // Blur the image and color considering the choice of the user.
-                blurMode && colorMode ? {
+                !blur ? { // if the game is won : Clear filters from image
+                  filter: `grayscale(0%) blur(0px)`, 
+                  WebkitFilter: `grayscale(0%) blur(0px)`, 
+                 }:
+                 blurMode && !colorMode ? {
                   filter: `grayscale(100%) blur(${Math.max(0, 15 - attempts.length)}px)`, // progressively reduce the blur on the image
                   WebkitFilter: `grayscale(100%) blur(${Math.max(15 - attempts.length)}px)`, 
                 } :
                 //Full blur and grey
-                !blurMode && colorMode ? {
+                !blurMode && !colorMode ? {
                   filter: `grayscale(100%) blur(${15}px)`,
                   WebkitFilter: `grayscale(100%) blur(${15}px)`,
                 }:
                 // Adaptive blur and colors
-                  blurMode && !colorMode ?
+                  blurMode && !colorMode ? 
                 {
                   filter: `blur(${Math.max(0, 15 - attempts.length)}px)`, // progressively reduce the blur on the image
                   WebkitFilter: `blur(${Math.max(15 - attempts.length)}px)`, 
@@ -121,7 +168,7 @@ function Photo() {
               <p>Loading Error...</p> 
             )}
             <br></br>
-            <p>Number of attempts: {attempts.length}</p> {/* Traduction de "Nombre d'essais" */}
+            <p>Number of attempts: {attempts.length}</p>
             {/* Options de jeu */}
             <div>
               <table id="button-choice">
@@ -137,7 +184,7 @@ function Photo() {
                         <span className="slider round"></span>
                       </label>
                       <br />
-                      <label>Each attempt reduces the blur</label> {/* Traduction de "Chaque essai réduit le flou" */}
+                      <label>Each attempt reduces the blur</label>
                     </td>
                     <td>
                       <label className="switch">
@@ -149,7 +196,7 @@ function Photo() {
                         <span className="slider round"></span>
                       </label>
                       <br />
-                      <label>Show colors</label> {/* Traduction de "Afficher les couleurs" */}
+                      <label>Show colors</label>
                     </td>
                   </tr>
                 </tbody>
@@ -175,13 +222,13 @@ function Photo() {
                     />
                   </td>
                   <td className="text-input">
-                    <button type="submit" disabled={gameOver}>Guess</button> {/* Traduction de "Deviner" */}
+                    <button type="submit" disabled={gameOver}>Guess</button>
                   </td>
                 </tr>
               </tbody>
             </table>
           </form>
-          <Suspense fallback={<h2>Loading...</h2>}> {/* Traduction de "Chargement..." */}
+          <Suspense fallback={<h2>Loading...</h2>}>
             <div style={{ opacity: isStale ? 0.5 : 1 }}>
               {!gameOver && <SearchResults query={deferredQuery} onSelect={handleSelect} exclude={attempts.map(a => a.nom)} />}
             </div>
@@ -203,17 +250,17 @@ function Photo() {
           </ul>
         </div>
 
-        {gameOver && <h3>Congratulations! You found the professor of the day: {professeur.prenom} {professeur.nom} 🎉</h3>} {/* Traduction de "Bravo ! Vous avez trouvé le professeur du jour" */}
+        {gameOver && <h3>Congratulations! You found the professor of the day: {professeur.prenom} {professeur.nom} 🎉</h3>}
 
         <div>
           <hr className="separator" />
-          <h3>The professor from yesterday was: {lastProfessor}</h3> {/* Traduction de "Le professeur d'hier était" */}
+          <h3>The professor from yesterday was: {lastProfessor}</h3>
         </div>
 
         {/* Section promotionnelle */}
         <div className="box">
-          <h1>Want more?</h1> {/* Traduction de "Vous en voulez plus ?" */}
-          <h2>Play our other games!</h2> {/* Traduction de "Jouez à nos autres jeux !" */}
+          <h1>Want more?</h1>
+          <h2>Play our other games!</h2>
           <br />
           <div>
             <Link to="/etudiantdle" className="button-link">

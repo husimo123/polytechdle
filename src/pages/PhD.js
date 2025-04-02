@@ -6,6 +6,11 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Professeur from "../components/Professeur.js";
 import { useLanguage } from "../LanguageContext";
+import Cookies from 'js-cookie'; // Importation de js-cookie
+import { Line } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
+
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 function PhD() {
   const [query, setQuery] = useState("");
@@ -17,28 +22,79 @@ function PhD() {
   const [gameOver, setGameOver] = useState(false);
   const { language } = useLanguage();
 
+  // Charger les statistiques depuis les cookies
+  const loadStatistics = () => {
+    const stats = Cookies.get('phdStats');
+    if (stats) {
+      return JSON.parse(stats);
+    } else {
+      return {
+        totalGames: 0,
+        totalWins: 0,
+        totalAttempts: 0,
+        longestWinStreak: 0,
+        currentWinStreak: 0,
+        games: []
+      };
+    }
+  };
+
+  // Sauvegarder les statistiques dans les cookies
+  const saveStatistics = (stats) => {
+    Cookies.set('phdStats', JSON.stringify(stats), { expires: 365 });
+  };
+
+  // Initialiser les statistiques
+  const [stats, setStats] = useState(loadStatistics);
+
+  // Fonction de mise à jour après une partie
+  const updateStatistics = (isCorrect) => {
+    let newStats = { ...stats };
+    newStats.totalGames++;
+
+    if (isCorrect) {
+      newStats.totalWins++;
+      newStats.currentWinStreak++;
+      if (newStats.currentWinStreak > newStats.longestWinStreak) {
+        newStats.longestWinStreak = newStats.currentWinStreak;
+      }
+    } else {
+      newStats.currentWinStreak = 0;
+    }
+
+    newStats.totalAttempts += attempts.length;
+    newStats.games.push({
+      date: new Date().toISOString(),
+      attempts: attempts.length,
+      correct: isCorrect
+    });
+
+    setStats(newStats);
+    saveStatistics(newStats);
+  };
+
   // Get data from the database
   useEffect(() => {
     fetch('http://localhost:5000/professeur-du-jour')
-        .then(response => response.json())
-        .then(data => setProfesseur(data))
-        .catch(error => console.error('Erreur:', error));
-
+      .then(response => response.json())
+      .then(data => setProfesseur(data))
+      .catch(error => console.error('Erreur:', error));
   }, []);
-  
+
   const handleSelect = (prof) => {
     if (gameOver || attempts.some((attempt) => attempt.nom === prof.nom)) return;
-    
+
     const isCorrect = prof.nom.toLowerCase() === professeur.nom.toLowerCase();
     const newAttempt = new Professeur(
-      prof.nom, prof.prenom, prof.genre, prof.laris, prof.age, prof.specialite, 
+      prof.nom, prof.prenom, prof.genre, prof.laris, prof.age, prof.specialite,
       prof.univ_etudes, prof.annee_phd, prof.statut, prof.sujet_these, prof.photo, isCorrect
     );
-    
+
     setAttempts((prevAttempts) => [newAttempt, ...prevAttempts]);
     if (isCorrect) setGameOver(true);
+    updateStatistics(isCorrect);
   };
-  
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!query.trim() || gameOver) return;
@@ -80,6 +136,18 @@ function PhD() {
     placeholder,
     submit,
   } = texts[language];
+
+  // Graph data for attempts
+  const graphData = {
+    labels: stats.games.map(game => new Date(game.date).toLocaleDateString()), // Dates des parties
+    datasets: [{
+      label: 'Nombre d\'essais par partie',
+      data: stats.games.map(game => game.attempts),
+      borderColor: 'rgba(75, 192, 192, 1)',
+      backgroundColor: 'rgba(75, 192, 192, 0.2)',
+      fill: true,
+    }],
+  };
 
   return (
     <div>
@@ -179,6 +247,19 @@ function PhD() {
         <div>
           <hr className="separator" />
           <h3>{lastProfessorText} {lastProfessor}</h3>
+        </div>
+
+        {/* Statistiques */}
+        <div className="box">
+          <h3>Statistiques</h3>
+          <p>Total de jeux : {stats.totalGames}</p>
+          <p>Victoires : {stats.totalWins}</p>
+          <p>Meilleure série de victoires : {stats.longestWinStreak}</p>
+          <p>Série actuelle : {stats.currentWinStreak}</p>
+          <p>Essais en moyenne : {(stats.totalAttempts / stats.totalGames).toFixed(2)}</p>
+          <div>
+            <Line data={graphData} />
+          </div>
         </div>
 
         <div className="box">

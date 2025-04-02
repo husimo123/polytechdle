@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/img-redundant-alt */
 import React, { useEffect, useState, Suspense, useDeferredValue } from "react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "../LanguageContext";
@@ -6,6 +5,7 @@ import SearchResults from "../components/SearchResults.js";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Professeur from "../components/Professeur.js";
+import Cookies from 'js-cookie'; // Importation de js-cookie
 
 function Classic() {
   const [query, setQuery] = useState("");
@@ -15,6 +15,7 @@ function Classic() {
   const [professeur, setProfesseur] = useState(null);
   const [gameOver, setGameOver] = useState(false);
   const { language } = useLanguage();
+  const currentMode = "classic"; // Mode actuel : Classic
 
   // Get data from the database
   useEffect(() => {
@@ -90,6 +91,49 @@ function Classic() {
     tableHeaders,
   } = texts[language];
 
+  // Charger les statistiques depuis les cookies
+  const loadStatistics = (mode) => {
+    const stats = Cookies.get(`${mode}Stats`);
+    if (stats) {
+      return JSON.parse(stats);
+    } else {
+      return {
+        totalGames: 0,
+        totalWins: 0,
+        totalAttempts: 0,
+        longestWinStreak: 0,
+        currentWinStreak: 0,
+        attemptsPerGame: [],
+        winDates: []
+      };
+    }
+  };
+
+  // Sauvegarder les statistiques dans les cookies
+  const saveStatistics = (mode, stats) => {
+    Cookies.set(`${mode}Stats`, JSON.stringify(stats));
+  };
+
+  // Met à jour les statistiques après une partie
+  const updateStatistics = (mode, win, attempts) => {
+    let stats = loadStatistics(mode);
+    stats.totalGames += 1;
+    stats.totalAttempts += attempts;
+    stats.attemptsPerGame.push(attempts);
+    if (win) {
+      stats.totalWins += 1;
+      stats.currentWinStreak += 1;
+      if (stats.currentWinStreak > stats.longestWinStreak) {
+        stats.longestWinStreak = stats.currentWinStreak;
+      }
+      stats.winDates.push(new Date().toLocaleDateString());
+    } else {
+      stats.currentWinStreak = 0;
+    }
+    saveStatistics(mode, stats);
+  };
+
+  // Gestion de la sélection du professeur
   const handleSelect = (prof) => {
     if (gameOver || attempts.some((attempt) => attempt.nom === prof.nom)) return;
     
@@ -100,9 +144,14 @@ function Classic() {
     );
     
     setAttempts((prevAttempts) => [newAttempt, ...prevAttempts]);
-    if (isCorrect) setGameOver(true);
+
+    // Incrémenter les statistiques quand la partie se termine
+    if (isCorrect) {
+      updateStatistics(currentMode, true, attempts.length + 1);
+      setGameOver(true);
+    }
   };
-  
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!query.trim() || gameOver) return;
