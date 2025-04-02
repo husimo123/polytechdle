@@ -7,7 +7,17 @@ de [www.onepiecedle.net ](https://onepiecedle.net/) avec les professeurs de l'é
 
 (ajouter un lien vers une demo)
 
-
+## Manuel d'utilisation
+1. Cloner le git et l'ouvrir avec VSCode.
+2. Ouvrir XAMPP et lancer Apache et MySQL, créer une BDD 'polytechdle'.
+3. Importer le fichier *professeur.sql* du git.
+4. Installer Node.JS and REACT.
+5. Ouvrir un terminal de VSCode et executer la commande : 
+``` console
+    npm install
+    npm start
+```
+6. Jouez !
 
 ## Roles de chacun :
 
@@ -28,21 +38,20 @@ de [www.onepiecedle.net ](https://onepiecedle.net/) avec les professeurs de l'é
 - Recherche sur les professeurs pour la BDD
 - Page mode photo 
 
-# A completer :
 
 #### 2) L'intégration de REACT et NODE.JS :
 
  ### Titouan 
 - Page mode classic 
-
+- Statistiques des joueurs
+- Traduction français/anglais
 
 ### Dorian 
 - Page index
 - Page mode phd
+- Recherche des profs
 
 ### Hugo 
 - Page mode photo 
-- README.md
-
-
-(bugs connus)
+- Compte rendu
+- Un peu de tout
