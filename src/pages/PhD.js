@@ -21,6 +21,7 @@ function PhD() {
         .then(response => response.json())
         .then(data => setProfesseur(data))
         .catch(error => console.error('Erreur:', error));
+
   }, []);
   
   const handleSelect = (prof) => {
@@ -72,7 +73,7 @@ function PhD() {
         <div className="box">
           <div className="game-container">
             <h3>Quel professeur a obtenu son diplôme PhD cette année ?</h3>
-            <div className="PhD_Année">2003</div>
+            <div className="PhD_Année">{professeur ? professeur.annee_phd : "Chargement..."}</div>
             <div className="Indices">
               <div className={`Box_Indice ${attempts.length < 3 ? "disabled" : ""}`}>
                 <img src="/img/icon-age.png" alt="Icône 1" />

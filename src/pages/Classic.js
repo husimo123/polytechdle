@@ -117,13 +117,13 @@ function Classic() {
               <div className={`Box_Indice ${attempts.length < 4 ? "disabled" : ""}`}>
                 <img src="/img/icon-statut.png" alt="Icone 1" />
                 <p>{statusHint}</p>
-                {attempts.length < 4 && <p><span className="small-italic">Dans  {6 - attempts.length} Essais</span></p>}
+                {attempts.length < 4 && <p><span className="small-italic">Dans  {4 - attempts.length} Essais</span></p>}
                 {attempts.length >= 4 && <div className="tooltip">{statusTooltip} {professeur.statut}</div>}
               </div>
               <div className={`Box_Indice ${attempts.length < 8 ? "disabled" : ""}`}>
                 <img src="/img/icon-these.png" alt="Icone 2" />
                 <p>{thesisHint}</p>
-                {attempts.length < 8 && <p><span className="small-italic">Dans  {6 - attempts.length} Essais</span></p>}
+                {attempts.length < 8 && <p><span className="small-italic">Dans  {8 - attempts.length} Essais</span></p>}
                 {attempts.length >= 8 && <div className="tooltip">{thesisTooltip} {professeur.sujet_these}</div>}
               </div>
             </div>
